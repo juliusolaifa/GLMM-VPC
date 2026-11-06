@@ -91,7 +91,7 @@ vpc_glmmtmb_likelihood <- function(fit) {
 #' Extract family-specific parameters from a restricted glmmTMB fit
 .glmmvpc_extract_null_family_params <- function(raw_fit, family) {
   pars <- switch(family,
-    gaussian = c(phi = unname(stats::sigma(raw_fit)^2)),
+    gaussian = c(sigma2 = unname(stats::sigma(raw_fit)^2)),
     poisson = numeric(),
     nbinom = c(theta = unname(stats::sigma(raw_fit))),
     cpg = {
