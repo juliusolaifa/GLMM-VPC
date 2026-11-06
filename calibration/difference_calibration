@@ -176,8 +176,11 @@ calibrate_vpc_difference_improved <- function(
     statistic, beta, xa, xb, family="poisson",
     family_params=numeric(0), information, alpha=c(.05),
     use_J=FALSE, rel.tol=2e-5) {
-  if (!identical(use_J, FALSE))
-    stop("J_Q numerical integration has not been error-certified; use_J=FALSE for H_Q conservative calibration.")
+  if (!is.logical(use_J) || length(use_J) != 1L || is.na(use_J))
+    stop("use_J must be TRUE or FALSE.")
+  if (!is.numeric(rel.tol) || length(rel.tol) != 1L ||
+      !is.finite(rel.tol) || rel.tol <= 0 || rel.tol >= 1)
+    stop("rel.tol must be a finite number in (0, 1).")
   if (!is.numeric(statistic) || length(statistic)!=1L ||
       !is.finite(statistic) || statistic<0)
     stop("Invalid statistic.")
@@ -195,44 +198,51 @@ calibrate_vpc_difference_improved <- function(
       (pi-g$angle)*k/(2*pi*sqrt(M))*exp(-t/(2*M))*
       (2*stats::pnorm(k*sqrt(t/M))-1)
   }
-  # EXPERIMENTAL J_Q code below is not enabled for inference.
-  # J = E[B_L,lambda(|V|,R)>t], with a chi-bar-square R^2.
-  # Integrate over the half-normal V and chi_1/chi_2 radii.
+  # Numerical J_Q from equation (125) of vpc.pdf. Integration is
+  # approximate, not a rigorous interval-certified upper bound.
+  # The exact zero-coupling identity avoids a flat radial objective.
   J <- function(t) {
-    if (t<=0) return(1)
+    if (t <= 0) return(1)
     L <- g$kappa
-    lambdas <- c(g$lambda_plus,g$lambda_minus)
-    f <- function(v,r,lam) {
-      b <- v*v+r*r-pmax(0,r-lam*v)^2/(1+L*L)
-      as.numeric(b>t)
+    if (L == 0) return(p1(t))
+    M <- 1 + L * L
+    halfnorm <- function(v) sqrt(2 / pi) * exp(-v * v / 2)
+    radial_tail <- function(v, lam, df) {
+      if (v * v >= t) return(1)
+      delta <- t - v * v
+      r0 <- sqrt(delta)
+      if (r0 <= lam * v) {
+        root <- r0
+      } else {
+        # Rationalized positive root of
+        # L^2*r^2 + 2*lam*v*r = M*(t-v^2) + lam^2*v^2.
+        c0 <- M * delta + (lam * v)^2
+        root <- c0 / (sqrt((lam * v)^2 + L^2 * c0) + lam * v)
+      }
+      stats::pchisq(root * root, df = df, lower.tail = FALSE)
     }
-    # For fixed v, B is monotone in r, allowing an exact threshold
-    # in r and avoiding discontinuous quadrature integrands.
-    rtail <- function(v,lam,df) {
-      b0 <- v*v-pmax(0,-lam*v)^2/(1+L*L)
-      if (b0>t) return(1)
-      upper <- max(1,sqrt(t)+v+1)
-      while (f(v,upper,lam)<=0 && upper<1e7) upper<-2*upper
-      if (upper>=1e7) stop("Unable to bracket radial threshold.")
-      root <- stats::uniroot(function(r)
-        v*v+r*r-pmax(0,r-lam*v)^2/(1+L*L)-t,
-        c(0,upper),tol=1e-8)$root
-      stats::pchisq(root*root,df,lower.tail=FALSE)
+    integrate_tail <- function(lam, df) {
+      f <- function(v) vapply(v, function(vi)
+        radial_tail(vi, lam, df) * halfnorm(vi), numeric(1))
+      # Split at sqrt(t), where the radial tail becomes identically one.
+      cutoff <- sqrt(t)
+      integral <- stats::integrate(f, 0, cutoff, rel.tol = rel.tol,
+                                   subdivisions = 500L,
+                                   stop.on.error = TRUE)
+      if (!is.finite(integral$value) || !is.finite(integral$abs.error))
+        stop("J_Q quadrature failed.")
+      # Upper numerical allowance: conservative relative to the returned
+      # quadrature estimate, but NOT a mathematically certified error bound.
+      estimate <- integral$value + stats::pchisq(t, 1, lower.tail = FALSE)
+      min(1, estimate + 10 * integral$abs.error)
     }
-    halfnorm <- function(v) sqrt(2/pi)*exp(-v*v/2)
-    integrate_one <- function(lam,df) {
-      integrand <- function(v) vapply(v,function(vi)
-        rtail(vi,lam,df)*halfnorm(vi),numeric(1))
-      stats::integrate(integrand,0,Inf,rel.tol=rel.tol,
-                       subdivisions=250L)$value
-    }
-    mean(vapply(lambdas,function(lam) {
-      # chi_0 contributes an atom at r=0.
-      atom <- stats::pchisq(t,1,lower.tail=FALSE)
-      g$weights[1]*atom +
-        g$weights[2]*integrate_one(lam,1) +
-        g$weights[3]*integrate_one(lam,2)
-    },numeric(1)))
+    per_sign <- vapply(c(g$lambda_plus, g$lambda_minus), function(lam) {
+      # The chi_0 component has R=0 and B=V^2.
+      g$weights[1] * p1(t) +
+        g$weights[2] * integrate_tail(lam, 1) +
+        g$weights[3] * integrate_tail(lam, 2)
+    }, numeric(1))
+    min(1, max(0, mean(per_sign)))
   }
   tailfun <- function(t) {
     h <- H(t)
@@ -252,7 +262,7 @@ calibrate_vpc_difference_improved <- function(
   list(statistic=statistic,p_value_upper_bound=tailfun(statistic),
        critical_values=critical,reject=statistic>critical,
        geometry=g,canonical_information=can$Q,
-       method=if(use_J) "min(J_Q,H_Q)" else "H_Q",
+       method=if(use_J) "min(J_Q_numeric,H_Q)" else "H_Q",
        scope="Gaussian vertex-local conservative; not globally uniform GLMM",
-       numerical_integration=if(use_J) "deterministic integration; validate error" else "closed form")
+       numerical_integration=if(use_J) "approximate quadrature; not certified for strict size control" else "closed form")
 }
