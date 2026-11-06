@@ -159,6 +159,9 @@ vpc_test <- function(fit,
     if (!is.null(x1) || !identical(alternative, "two.sided"))
       stop("Pointwise requires x0 only; alternative must be 'two.sided'.")
     observed <- vpc_pointwise_lrt(fit, x0, require_acceptable = acceptable)
+    if (calibration != "none" &&
+        !isTRUE(observed$null_fit$diagnostics$boundary_complete))
+      stop("Pointwise calibration requires both ray and vertex restricted fits.")
   } else {
     .vpc_test_scalar(x0, "x0")
     .vpc_test_scalar(x1, "x1")
