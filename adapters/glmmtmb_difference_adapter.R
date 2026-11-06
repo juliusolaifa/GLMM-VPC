@@ -1,7 +1,7 @@
 # Difference-contrast LRT adapter for the glmmTMB engine.
-# IMPORTANT: glmmTMB native theta coordinates cover Gamma > 0 only.
-# This is an INTERIOR constrained optimizer, not a complete PSD-stratified
-# global null fitter. It must not be used for final boundary-aware inference.
+# The native glmmTMB theta parameterization covers Gamma > 0 only.
+# This adapter also evaluates the vertex and available rank-one candidates,
+# but does not certify the global restricted optimum across all PSD strata.
 # Requires fit_glmm.R, constrained_fit.R, glmmtmb_likelihood_adapter.R.
 
 .vpc_diff_scalar <- function(x, name) {
@@ -30,10 +30,10 @@ vpc_response_value <- function(beta, Gamma, family, family_params, x,
   }
   v <- max(0, drop(crossprod(c(1, x), Gamma %*% c(1, x))))
   if (family == 'gaussian') {
-    phi <- unname(family_params['phi'])
-    if (length(phi) != 1L || !is.finite(phi) || phi <= 0)
-      stop('Gaussian residual variance phi must be positive.')
-    return(v/(v+phi))
+    sigma2 <- unname(family_params['sigma2'])
+    if (length(sigma2) != 1L || !is.finite(sigma2) || sigma2 <= 0)
+      stop('Gaussian residual variance sigma2 must be positive.')
+    return(v/(v+sigma2))
   }
   # Log-link families. Scale by exp(2*eta+v) to reduce overflow.
   between <- -expm1(-v)  # B / exp(2 eta + 2 v)
@@ -225,18 +225,18 @@ fit_vpc_difference_rankone_gaussian <- function(
   if (!is.character(group) || length(group)!=1L ||
       !grepl("^[A-Za-z.][A-Za-z0-9._]*$",group))
     stop("Expected simple grouping column name.")
-  # Derive the original random slope column from the RE formula rather
-  # than assuming it is the same as the fixed-effects predictor.
-  random_expr <- bars[[1]][[2]]
-  vars <- all.vars(random_expr)
-  vars <- setdiff(vars,"1")
-  if (length(vars)!=1L) stop("Expected one random slope variable.")
-  slope <- fit$data[[vars]]
-  if (!is.numeric(slope) || any(!is.finite(slope)))
-    stop("Random slope column must be finite numeric.")
+  # Reuse the actual random-effects design, including transformed slopes.
+  re_formula <- stats::as.formula(call("~", bars[[1L]][[2L]]),
+                                  env=environment(fit$formula))
+  Xr <- stats::model.matrix(re_formula, data=fit$data)
+  if (ncol(Xr)!=2L || colnames(Xr)[1L]!="(Intercept)")
+    stop("Expected intercept and one random-slope design column.")
+  slope <- Xr[,2L]
+  if (any(!is.finite(slope))) stop("Random slope design is not finite.")
   directions <- list(intercept_only=c(1,0),
                      centered_slope=c(-(x0+x1)/2,1))
   candidates <- lapply(names(directions),function(nm) {
+    tryCatch({
     u <- directions[[nm]]
     dat <- fit$data
     col <- ".glmmvpc_difference_re"
@@ -275,16 +275,63 @@ fit_vpc_difference_rankone_gaussian <- function(
       logLik=ll,objective=check$objective,engine="glmmTMB",
       raw_fit=ans$fit,formula=f,diagnostics=dg,
       attempts=ans$attempts),class="glmmVPC_constrained_fit")
+    }, error=function(e) e)
   })
   names(candidates) <- names(directions)
   candidates
 }
 
+
+#' Enumerate rank-one equality directions at fixed nuisance parameters
+#'
+#' A numerical geometry helper, not a likelihood optimizer. The roots
+#' may be incomplete when the contrast touches zero without changing sign.
+#' @export
+vpc_difference_rankone_roots <- function(
+    beta, tau2, family, family_params, x0, x1,
+    fixed_design=NULL, grid_size=720L, tol=1e-9) {
+  if (!is.numeric(tau2) || length(tau2)!=1L ||
+      !is.finite(tau2) || tau2<=0)
+    stop("tau2 must be strictly positive.")
+  if (!is.numeric(grid_size) || length(grid_size)!=1L ||
+      grid_size<16L) stop("grid_size must be at least 16.")
+  if (x0==x1) stop("x0 and x1 must differ.")
+  grid <- seq(0,pi,length.out=as.integer(grid_size)+1L)
+  difference <- function(angle) {
+    u <- c(cos(angle),sin(angle))
+    vpc_response_difference(
+      beta,tau2*tcrossprod(u),family,family_params,
+      x0,x1,fixed_design)
+  }
+  vals <- vapply(grid,difference,numeric(1))
+  if (any(!is.finite(vals))) stop("Nonfinite contrast along rank-one circle.")
+  roots <- numeric(0)
+  for (i in seq_len(length(grid)-1L)) {
+    if (abs(vals[i])<=tol) roots <- c(roots,grid[i])
+    if (vals[i]*vals[i+1L]<0) {
+      roots <- c(roots,stats::uniroot(
+        difference,grid[c(i,i+1L)],tol=tol)$root)
+    }
+  }
+  if (abs(vals[length(vals)])<=tol) roots <- c(roots,pi)
+  roots <- sort(roots %% pi)
+  roots <- roots[!duplicated(round(roots,10))]
+  list(angles=roots,
+       directions=lapply(roots,function(a)c(cos(a),sin(a))),
+       contrast=vapply(roots,difference,numeric(1)),
+       grid_size=grid_size,
+       exhaustive=FALSE,
+       warning=paste(
+         "Sign-change enumeration can miss tangent or multiple roots;",
+         "nuisance parameters and variance were held fixed;",
+         "this is not a restricted maximum likelihood fit."))
+}
+
 #' Fit available strata of the response-scale VPC difference null
 #'
-#' This is an intermediate integration, NOT a boundary-complete fitter:
-#' the rank-one stratum is not optimized. The result is deliberately
-#' marked unsuitable for final calibrated inference.
+#' Numerical candidates are compared at the vertex, interior, and available
+#' rank-one strata. The rank-one nonlinear search is experimental and the
+#' global restricted optimum is NOT certified.
 #' @export
 fit_vpc_difference_null <- function(
     fit, x0, x1,
@@ -317,9 +364,9 @@ fit_vpc_difference_null <- function(
     d$constraint_violation <- 0
     d$selected_stratum <- "unrestricted full fit satisfying inequality"
     d$covariance_strata_checked <- d$selected_stratum
-    d$boundary_complete <- TRUE
+    d$boundary_complete <- FALSE
     d$global_optimality_verified <- FALSE
-    d$warning <- "LRT is zero if unrestricted fit is the numerical global MLE."
+    d$warning <- "LRT is zero conditional on unrestricted fit being the global MLE."
     return(structure(list(
       label = paste("difference", alternative), alternative = alternative,
       x0 = x0, x1 = x1, contrast = estimated,
@@ -358,6 +405,17 @@ fit_vpc_difference_null <- function(
         fit, x0, x1, require_acceptable=require_acceptable),
       error=function(e) list(rankone_error=e))
   }
+  # Non-Gaussian equality requires nonlinear rank-one fitting. This
+  # experimental search is not a global optimizer; failures are retained.
+  if (!identical(fit$family, "gaussian")) {
+    rankone <- list(rankone_nonlinear = tryCatch(
+      .vpc_difference_rankone_nonlinear(
+        fit, x0, x1, alternative = alternative,
+        fixed_design = fixed_design, maxeval = min(as.integer(maxeval), 400L),
+        feasibility_tol = feasibility_tol,
+        require_acceptable = require_acceptable),
+      error = function(e) e))
+  }
   candidates <- c(list(interior=interior,vertex=vertex),rankone)
   ok <- vapply(candidates, valid, logical(1))
   if (!any(ok)) stop("No usable restricted covariance stratum.")
@@ -370,18 +428,19 @@ fit_vpc_difference_null <- function(
   out$diagnostics$covariance_strata_checked <- names(ok)[ok]
   out$diagnostics$stratum_errors <- lapply(candidates, function(z)
     if (inherits(z, "error")) conditionMessage(z) else NULL)
-  out$diagnostics$boundary_complete <-
+  # Coverage of covariance strata is not a certificate of a global optimum.
+  out$diagnostics$boundary_complete <- FALSE
+  out$diagnostics$strata_enumerated <-
     identical(fit$family,"gaussian") &&
     identical(alternative,"two.sided") &&
     all(ok[c("interior","vertex","intercept_only","centered_slope")])
   out$diagnostics$global_optimality_verified <- FALSE
-  out$diagnostics$warning <- if (isTRUE(out$diagnostics$boundary_complete))
-    "All Gaussian equality covariance strata searched; numerical global optimality not certified."
-  else "Some covariance strata are unoptimized; this is not a certified restricted maximum."
+  out$diagnostics$warning <-
+    "Numerical candidates only; global restricted maximum and complete PSD alternative not certified."
   out
 }
 
-#' Observed difference LRT, provisional until rank-one fitting is integrated
+#' Observed difference LRT from provisional stratified restricted fitting
 #' @export
 vpc_difference_lrt <- function(
     fit, x0, x1,
@@ -400,5 +459,166 @@ vpc_difference_lrt <- function(
          x0, x1, fixed_design),
        diagnostics = list(full = fit$diagnostics,
                           null = null$diagnostics),
-       calibration = "not computed; rank-one null fitting pending")
+       calibration = "not computed; global restricted optimum not certified")
+}
+\n\n# ---- Internal experimental rank-one nonlinear likelihood candidate ----\n# Experimental rank-one constrained marginal likelihood optimization.
+# Source after fit_glmm.R and glmmtmb_difference_adapter.R.
+# Uses glmmTMB's Laplace approximation with ALL outer parameters fixed
+# at each evaluation, allowing the random-effects integral to be recomputed.
+# Extremely expensive; not a production-certified global optimizer.
+
+.vpc_rankone_family <- function(family) switch(family,
+  gaussian=stats::gaussian(), poisson=stats::poisson(),
+  nbinom=glmmTMB::nbinom2(link="log"),
+  cpg=glmmTMB::tweedie(link="log"),
+  stop("Unsupported family"))
+
+.vpc_rankone_fixed_model <- function(fit, angle, par, fixed_design=NULL) {
+  if (!requireNamespace("glmmTMB",quietly=TRUE) ||
+      !requireNamespace("lme4",quietly=TRUE))
+    stop("Install glmmTMB and lme4.")
+  if (length(lme4::findbars(fit$formula))!=1L)
+    stop("Requires one random intercept-and-slope term.")
+  bar <- lme4::findbars(fit$formula)[[1L]]
+  re <- stats::model.matrix(stats::as.formula(call("~",bar[[2L]]),
+    env=environment(fit$formula)),fit$data)
+  if (ncol(re)!=2L || colnames(re)[1L]!="(Intercept)")
+    stop("Expected two-column random design, intercept first.")
+  u <- c(cos(angle),sin(angle))
+  dat <- fit$data
+  nm <- ".glmmvpc_rankone_design"
+  if (nm %in% names(dat)) stop("Reserved design column collision.")
+  dat[[nm]] <- drop(re %*% u)
+  grp <- fit$group
+  if (!is.character(grp) || length(grp)!=1L ||
+      !grepl("^[A-Za-z.][A-Za-z0-9._]*$",grp))
+    stop("Expected simple grouping variable.")
+  fixed <- lme4::nobars(fit$formula)
+  term <- call("(",call("|",call("+",0L,as.name(nm)),as.name(grp)))
+  formula <- stats::as.formula(call("~",fixed[[2L]],
+    call("+",fixed[[3L]],term)),env=environment(fit$formula))
+  # Outer vector is (beta, log_sd, log_sigma2/size/phi, power_logit).
+  nb <- length(fit$beta)
+  if (length(par)!=nb+1L+length(fit$family_params))
+    stop("Outer parameter length mismatch.")
+  beta <- par[seq_len(nb)]
+  theta <- par[nb+1L]
+  disp <- if (fit$family %in% c("gaussian","nbinom","cpg"))
+    par[nb+2L] else numeric()
+  psi <- if (fit$family=="cpg") par[nb+3L] else numeric()
+  start <- list(beta=unname(beta),theta=theta)
+  map <- list(beta=factor(rep(NA_integer_,nb)),theta=factor(NA_integer_))
+  if (length(disp)) {
+    start$betadisp <- disp
+    map$betadisp <- factor(NA_integer_)
+  }
+  if (length(psi)) {
+    start$psi <- psi
+    map$psi <- factor(NA_integer_)
+  }
+  raw <- suppressWarnings(glmmTMB::glmmTMB(
+    formula,data=dat,family=.vpc_rankone_family(fit$family),
+    start=start,map=map))
+  ll <- as.numeric(stats::logLik(raw))
+  if (!is.finite(ll)) stop("Nonfinite rank-one marginal likelihood.")
+  fp <- switch(fit$family,
+    gaussian=c(sigma2=exp(disp)),poisson=numeric(),
+    nbinom=c(theta=exp(disp)),
+    cpg=c(phi=exp(disp),power=1+stats::plogis(psi)))
+  list(logLik=ll,beta=stats::setNames(beta,names(fit$beta)),
+       Gamma=exp(2*theta)*tcrossprod(u),family_params=fp,
+       raw_fit=raw,angle=angle,formula=formula)
+}
+
+#' Experimental constrained rank-one GLMM difference fit
+#'
+#' This is a computational prototype. Rebuilds the Laplace likelihood at
+#' each trial angle and parameter vector. Does not certify a global optimum.
+#' @export
+.vpc_difference_rankone_nonlinear <- function(
+    fit,x0,x1,alternative=c("two.sided","greater","less"),
+    fixed_design=NULL,maxeval=120L,feasibility_tol=1e-6,
+    require_acceptable=TRUE) {
+  alternative <- match.arg(alternative)
+  if (!inherits(fit,"glmmVPC_fit") || fit$engine!="glmmTMB")
+    stop("Requires glmmTMB glmmVPC_fit.")
+  if (x0==x1) stop("Distinct covariates required.")
+  if (!requireNamespace("nloptr",quietly=TRUE)) stop("Install nloptr.")
+  if (require_acceptable && !isTRUE(fit$diagnostics$numerically_acceptable))
+    stop("Full fit is not numerically acceptable.")
+  nb <- length(fit$beta)
+  eig <- eigen(fit$Gamma,symmetric=TRUE)
+  u0 <- eig$vectors[,1L]
+  angle0 <- atan2(u0[2L],u0[1L]) %% pi
+  sd0 <- sqrt(max(eig$values[1L],1e-5))
+  fp <- switch(fit$family,gaussian=log(fit$family_params[["sigma2"]]),
+    poisson=numeric(),nbinom=log(fit$family_params[["theta"]]),
+    cpg=c(log(fit$family_params[["phi"]]),
+          stats::qlogis(fit$family_params[["power"]]-1)))
+  start <- c(unname(fit$beta),log(sd0),fp,angle0)
+  # The angle is periodic with period pi. We leave it unconstrained
+  # and use multiple starts to avoid an artificial seam at 0/pi.
+  cache <- new.env(parent=emptyenv())
+  evaluate <- function(x) {
+    key <- paste(formatC(x,digits=14,format="fg"),collapse="|")
+    if (exists(key,envir=cache,inherits=FALSE))
+      return(get(key,envir=cache))
+    result <- tryCatch({
+      z <- .vpc_rankone_fixed_model(fit,tail(x,1L),head(x,-1L),fixed_design)
+      d <- vpc_response_difference(z$beta,z$Gamma,fit$family,
+        z$family_params,x0,x1,fixed_design)
+      list(ok=TRUE,fit=z,difference=d,nll=-z$logLik)
+    },error=function(e) list(ok=FALSE,error=conditionMessage(e),
+                             difference=NA_real_,nll=1e30))
+    assign(key,result,envir=cache)
+    result
+  }
+  objective <- function(x) evaluate(x)$nll
+  constraint <- function(x) {
+    z <- evaluate(x)
+    if (!z$ok) return(1e6)
+    switch(alternative,two.sided=z$difference,
+      greater=z$difference,less=-z$difference)
+  }
+  # COBYLA supports equality and inequality constraints without numerical
+  # gradients, but can be slow and may fail for tight feasibility tolerances.
+  starts <- lapply(c(0,pi/4,pi/2,3*pi/4),function(a) {
+    x <- start; x[length(x)] <- a; x
+  })
+  attempts <- lapply(starts,function(x) tryCatch(nloptr::nloptr(
+    x0=x,eval_f=objective,
+    eval_g_eq=if(alternative=="two.sided") constraint else NULL,
+    eval_g_ineq=if(alternative!="two.sided") constraint else NULL,
+    opts=list(algorithm="NLOPT_LN_COBYLA",maxeval=as.integer(maxeval),
+              xtol_rel=1e-6)),error=function(e)e))
+  valid <- vapply(attempts,function(a) {
+    if (inherits(a,"error") || is.null(a$solution)) return(FALSE)
+    z <- evaluate(a$solution)
+    z$ok && is.finite(z$difference) &&
+      (if(alternative=="two.sided") abs(z$difference)<=feasibility_tol
+       else if(alternative=="greater") z$difference<=feasibility_tol
+       else z$difference>=-feasibility_tol)
+  },logical(1))
+  if (!any(valid)) stop("No feasible nonlinear rank-one fit; attempts=",
+                        length(attempts),". This is NOT proof of infeasibility.")
+  ii <- which(valid)
+  best <- ii[which.min(vapply(attempts[ii],function(a)
+    evaluate(a$solution)$nll,numeric(1)))]
+  opt <- attempts[[best]]
+  z <- evaluate(opt$solution)
+  diagnostics <- list(feasible=TRUE,
+    numerically_acceptable=isTRUE(opt$status>0),
+    constraint_violation=if(alternative=="two.sided") abs(z$difference)
+      else if(alternative=="greater") max(0,z$difference)
+      else max(0,-z$difference),
+    optimizer="COBYLA / repeated glmmTMB Laplace evaluations",
+    optimizer_status=opt$status,selected_stratum="rankone_nonlinear",
+    boundary_complete=FALSE,global_optimality_verified=FALSE,
+    warning="Experimental nested likelihood; verify fixed-parameter map and convergence.")
+  structure(c(list(label="nonlinear rank-one difference",
+    alternative=alternative,x0=x0,x1=x1,contrast=z$difference,
+    logLik=z$fit$logLik,objective=z$nll,engine="glmmTMB",
+    diagnostics=diagnostics,attempts=attempts),
+    z$fit[c("beta","Gamma","family_params","raw_fit","angle","formula")]),
+    class="glmmVPC_constrained_fit")
 }
