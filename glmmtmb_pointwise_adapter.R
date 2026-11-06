@@ -11,7 +11,7 @@
 #' @param require_acceptable Require numerically acceptable restricted fit.
 #' @return glmmVPC_constrained_fit.
 #' @export
-fit_vpc_pointwise_null <- function(fit, x0, require_acceptable = TRUE) {
+fit_vpc_pointwise_ray <- function(fit, x0, require_acceptable = TRUE) {
   if (!inherits(fit, 'glmmVPC_fit') || !identical(fit$engine, 'glmmTMB'))
     stop('Pointwise adapter requires a glmmTMB glmmVPC_fit.')
   if (!is.numeric(x0) || length(x0) != 1L || !is.finite(x0))
@@ -95,9 +95,59 @@ fit_vpc_pointwise_null <- function(fit, x0, require_acceptable = TRUE) {
   ), class = 'glmmVPC_constrained_fit')
 }
 
-#' Provisional observed pointwise LRT (without asymptotic calibration)
-#' The restricted fit excludes the vertex, so the returned statistic must
-#' not be used for final boundary-aware inference without a vertex check.
+#' Fit the closed pointwise null ray, comparing positive-variance and vertex fits
+#' @description Compares the rank-one restricted fit with the exact Gamma=0
+#'   fit. A failed ray optimization cannot certify that the vertex is optimal.
+#' @export
+fit_vpc_pointwise_null <- function(fit, x0, require_acceptable = TRUE,
+                                   likelihood_tol = 1e-7) {
+  .vpc_glmmtmb_assert_fit(fit)
+  if (!is.numeric(x0) || length(x0) != 1L || !is.finite(x0))
+    stop('x0 must be one finite numeric value.')
+  if (!is.logical(require_acceptable) || length(require_acceptable) != 1L ||
+      is.na(require_acceptable)) stop('require_acceptable must be TRUE or FALSE.')
+  if (!is.numeric(likelihood_tol) || length(likelihood_tol) != 1L ||
+      !is.finite(likelihood_tol) || likelihood_tol < 0)
+    stop('likelihood_tol must be finite and nonnegative.')
+  ray <- tryCatch(fit_vpc_pointwise_ray(fit, x0, require_acceptable),
+                  error = function(e) e)
+  vertex <- tryCatch(fit_vpc_omnibus_null(fit, require_acceptable),
+                     error = function(e) e)
+  good <- function(z) inherits(z, 'glmmVPC_constrained_fit') &&
+    is.numeric(z$logLik) && length(z$logLik) == 1L && is.finite(z$logLik) &&
+    (!require_acceptable || isTRUE(z$diagnostics$numerically_acceptable))
+  ray_ok <- good(ray); vertex_ok <- good(vertex)
+  if (!ray_ok && !vertex_ok)
+    stop('Neither pointwise ray nor vertex fit is usable: ray: ',
+         if (inherits(ray,'error')) conditionMessage(ray) else 'invalid fit',
+         '; vertex: ', if (inherits(vertex,'error')) conditionMessage(vertex) else 'invalid fit')
+  if (ray_ok && vertex_ok) {
+    selected <- if (vertex$logLik > ray$logLik + likelihood_tol) 'vertex' else 'ray'
+  } else selected <- if (ray_ok) 'ray' else 'vertex'
+  ans <- if (selected == 'ray') ray else vertex
+  ans$label <- sprintf('pointwise: VPC(%s) = 0', format(x0))
+  ans$x0 <- x0
+  ans$diagnostics$selected_stratum <- selected
+  ans$diagnostics$covariance_strata_checked <- c(
+    if (ray_ok) 'pointwise rank-one ray (positive variance)',
+    if (vertex_ok) 'vertex (Gamma=0)')
+  ans$diagnostics$boundary_complete <- ray_ok && vertex_ok
+  ans$diagnostics$global_optimality_verified <- FALSE
+  ans$diagnostics$stratum_logLik <- c(
+    ray = if (ray_ok) ray$logLik else NA_real_,
+    vertex = if (vertex_ok) vertex$logLik else NA_real_)
+  ans$diagnostics$stratum_errors <- list(
+    ray = if (inherits(ray,'error')) conditionMessage(ray) else NULL,
+    vertex = if (inherits(vertex,'error')) conditionMessage(vertex) else NULL)
+  ans$diagnostics$warning <- if (ray_ok && vertex_ok)
+    'Both null strata searched; numerical convergence does not certify a global optimum.'
+  else 'One null stratum was not successfully optimized; restricted maximum is not certified.'
+  if (require_acceptable && !(ray_ok && vertex_ok))
+    stop('Pointwise null is not boundary-complete: ', ans$diagnostics$warning)
+  ans
+}
+
+#' Observed pointwise LRT, without asymptotic calibration
 #' @export
 vpc_pointwise_lrt <- function(fit, x0, require_acceptable = TRUE,
                               negative_tol = 1e-6) {
@@ -107,5 +157,6 @@ vpc_pointwise_lrt <- function(fit, x0, require_acceptable = TRUE,
   stat <- vpc_lrt_statistic(fit, null, negative_tol = negative_tol)
   list(statistic = stat, x0 = x0, full_fit = fit, null_fit = null,
        full_logLik = fit$logLik, null_logLik = null$logLik,
+       calibration = 'not computed',
        diagnostics = list(full = fit$diagnostics, null = null$diagnostics))
 }
