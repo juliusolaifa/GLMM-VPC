@@ -83,7 +83,7 @@ vpc_response_difference <- function(beta, Gamma, family, family_params,
   fp <- switch(fit$family,
                gaussian = {
                  if (length(disp)!=1L) stop('Expected one Gaussian dispersion.')
-                 c(phi=exp(disp))
+                 c(sigma2=exp(disp))
                },
                poisson = numeric(),
                nbinom = {
