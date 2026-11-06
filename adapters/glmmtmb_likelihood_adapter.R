@@ -155,20 +155,3 @@ fit_vpc_omnibus_null <- function(fit, require_acceptable = TRUE) {
     diagnostics = d, attempts = ans$attempts
   ), class = "glmmVPC_constrained_fit")
 }
-
-#' Observed omnibus LRT, without asymptotic calibration
-#' @export
-vpc_omnibus_lrt <- function(fit, require_acceptable = TRUE,
-                            negative_tol = 1e-6) {
-  .vpc_glmmtmb_assert_fit(fit)
-  if (require_acceptable &&
-      !isTRUE(fit$diagnostics$numerically_acceptable))
-    stop("Full fit is not numerically acceptable.")
-  null_fit <- fit_vpc_omnibus_null(fit, require_acceptable)
-  stat <- vpc_lrt_statistic(fit, null_fit, negative_tol)
-  list(statistic = stat, full_fit = fit, null_fit = null_fit,
-       full_logLik = fit$logLik, null_logLik = null_fit$logLik,
-       calibration = "not computed",
-       diagnostics = list(full = fit$diagnostics,
-                          null = null_fit$diagnostics))
-}
