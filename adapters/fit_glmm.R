@@ -31,7 +31,7 @@ register_glmm_engine <- function(name, adapter, overwrite = FALSE) {
   Gamma <- (Gamma + t(Gamma)) / 2
   if (any(!is.finite(Gamma))) stop("Nonfinite covariance estimate.")
   fp <- switch(family,
-    gaussian = c(phi = unname(stats::sigma(raw_fit)^2)),
+    gaussian = c(sigma2 = unname(stats::sigma(raw_fit)^2)),
     poisson = numeric(),
     nbinom = c(theta = unname(stats::sigma(raw_fit))),
     cpg = {
