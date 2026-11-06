@@ -147,16 +147,3 @@ fit_vpc_pointwise_null <- function(fit, x0, require_acceptable = TRUE,
   ans
 }
 
-#' Observed pointwise LRT, without asymptotic calibration
-#' @export
-vpc_pointwise_lrt <- function(fit, x0, require_acceptable = TRUE,
-                              negative_tol = 1e-6) {
-  if (require_acceptable && !isTRUE(fit$diagnostics$numerically_acceptable))
-    stop('Full fit is not numerically acceptable.')
-  null <- fit_vpc_pointwise_null(fit, x0, require_acceptable)
-  stat <- vpc_lrt_statistic(fit, null, negative_tol = negative_tol)
-  list(statistic = stat, x0 = x0, full_fit = fit, null_fit = null,
-       full_logLik = fit$logLik, null_logLik = null$logLik,
-       calibration = 'not computed',
-       diagnostics = list(full = fit$diagnostics, null = null$diagnostics))
-}
