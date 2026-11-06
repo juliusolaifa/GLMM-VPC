@@ -200,6 +200,86 @@ fit_vpc_difference_interior <- function(fit, x0, x1,
 }
 
 
+
+#' Gaussian equality-null rank-one candidates
+#'
+#' For Gaussian VPC, equality at distinct x0,x1 is equivalent to
+#' (u'z(x1))^2=(u'z(x0))^2. Thus u2=0 or
+#' 2*u1+(x0+x1)*u2=0. Both lines are fitted exactly.
+#' This reduction DOES NOT hold for non-Gaussian response-scale VPCs.
+#' @export
+fit_vpc_difference_rankone_gaussian <- function(
+    fit, x0, x1, require_acceptable=TRUE) {
+  if (!identical(fit$family,"gaussian"))
+    stop("This exact two-direction reduction applies only to Gaussian VPC.")
+  if (!requireNamespace("lme4",quietly=TRUE))
+    stop("Install lme4.")
+  if (!exists(".glmmvpc_glmmtmb_adapter",mode="function"))
+    stop("Source fit_glmm.R first.")
+  .vpc_glmmtmb_assert_fit(fit)
+  if (x0==x1) stop("x0 and x1 must differ.")
+  if (!is.data.frame(fit$data)) stop("Full fit must retain data.")
+  bars <- lme4::findbars(fit$formula)
+  if (length(bars)!=1L) stop("Expected one random intercept/slope term.")
+  group <- fit$group
+  if (!is.character(group) || length(group)!=1L ||
+      !grepl("^[A-Za-z.][A-Za-z0-9._]*$",group))
+    stop("Expected simple grouping column name.")
+  # Derive the original random slope column from the RE formula rather
+  # than assuming it is the same as the fixed-effects predictor.
+  random_expr <- bars[[1]][[2]]
+  vars <- all.vars(random_expr)
+  vars <- setdiff(vars,"1")
+  if (length(vars)!=1L) stop("Expected one random slope variable.")
+  slope <- fit$data[[vars]]
+  if (!is.numeric(slope) || any(!is.finite(slope)))
+    stop("Random slope column must be finite numeric.")
+  directions <- list(intercept_only=c(1,0),
+                     centered_slope=c(-(x0+x1)/2,1))
+  candidates <- lapply(names(directions),function(nm) {
+    u <- directions[[nm]]
+    dat <- fit$data
+    col <- ".glmmvpc_difference_re"
+    if (col %in% names(dat)) stop("Reserved column already exists.")
+    dat[[col]] <- u[1]+u[2]*slope
+    fixed <- lme4::nobars(fit$formula)
+    re_term <- call("|",call("+",0,as.name(col)),as.name(group))
+    f <- stats::as.formula(call("~",fixed[[2]],
+       call("+",fixed[[3]],call("(",re_term))),
+       env=environment(fit$formula))
+    ans <- .glmmvpc_glmmtmb_adapter(f,dat,fit$family,fit$control)
+    .vpc_glmmtmb_compare_rows(fit$raw_fit,ans$fit)
+    ll <- as.numeric(ans$diagnostics$logLik)
+    check <- .vpc_glmmtmb_objective_check(
+      ans$fit,ll,.vpc_glmmtmb_ll_tol(fit))
+    if (!check$consistent) stop("Objective mismatch.")
+    vc <- as.matrix(glmmTMB::VarCorr(ans$fit)$cond[[group]])
+    if (!identical(dim(vc),c(1L,1L)) || !is.finite(vc[1,1]) ||
+        vc[1,1]<0) stop("Invalid scalar random-effect variance.")
+    G <- unname(vc[1,1])*tcrossprod(u)
+    beta <- glmmTMB::fixef(ans$fit)$cond
+    fp <- .glmmvpc_extract_null_family_params(ans$fit,fit$family)
+    d <- vpc_response_difference(beta,G,fit$family,fp,x0,x1)
+    if (!is.finite(d) || abs(d)>1e-8)
+      stop("Gaussian rank-one equality check failed.")
+    dg <- ans$diagnostics
+    dg$feasible <- TRUE
+    dg$constraint_violation <- abs(d)
+    dg$rankone_direction <- u
+    dg$selected_stratum <- paste0("rankone_",nm)
+    dg$boundary_complete <- FALSE
+    dg$global_optimality_verified <- FALSE
+    structure(list(label="difference Gaussian rank-one equality",
+      alternative="two.sided",x0=x0,x1=x1,contrast=d,
+      beta=beta,Gamma=G,family_params=fp,
+      logLik=ll,objective=check$objective,engine="glmmTMB",
+      raw_fit=ans$fit,formula=f,diagnostics=dg,
+      attempts=ans$attempts),class="glmmVPC_constrained_fit")
+  })
+  names(candidates) <- names(directions)
+  candidates
+}
+
 #' Fit available strata of the response-scale VPC difference null
 #'
 #' This is an intermediate integration, NOT a boundary-complete fitter:
@@ -270,14 +350,17 @@ fit_vpc_difference_null <- function(
       (!require_acceptable ||
        isTRUE(z$diagnostics$numerically_acceptable))
   }
-  ok <- c(interior = valid(interior), vertex = valid(vertex))
-  if (!any(ok)) {
-    msg <- function(z) if (inherits(z, "error")) conditionMessage(z) else
-      "candidate failed validation"
-    stop("No usable restricted candidate: interior: ", msg(interior),
-         "; vertex: ", msg(vertex))
+  rankone <- list()
+  if (identical(fit$family, "gaussian") &&
+      identical(alternative, "two.sided")) {
+    rankone <- tryCatch(
+      fit_vpc_difference_rankone_gaussian(
+        fit, x0, x1, require_acceptable=require_acceptable),
+      error=function(e) list(rankone_error=e))
   }
-  candidates <- list(interior = interior, vertex = vertex)
+  candidates <- c(list(interior=interior,vertex=vertex),rankone)
+  ok <- vapply(candidates, valid, logical(1))
+  if (!any(ok)) stop("No usable restricted covariance stratum.")
   lls <- vapply(names(candidates), function(k)
     if (ok[[k]]) candidates[[k]]$logLik else NA_real_, numeric(1))
   chosen <- names(which.max(replace(lls, is.na(lls), -Inf)))
@@ -287,11 +370,14 @@ fit_vpc_difference_null <- function(
   out$diagnostics$covariance_strata_checked <- names(ok)[ok]
   out$diagnostics$stratum_errors <- lapply(candidates, function(z)
     if (inherits(z, "error")) conditionMessage(z) else NULL)
-  out$diagnostics$boundary_complete <- FALSE
+  out$diagnostics$boundary_complete <-
+    identical(fit$family,"gaussian") &&
+    identical(alternative,"two.sided") &&
+    all(ok[c("interior","vertex","intercept_only","centered_slope")])
   out$diagnostics$global_optimality_verified <- FALSE
-  out$diagnostics$warning <- paste(
-    "Rank-one constrained likelihood is not optimized;",
-    "this is not a certified maximum over the full PSD null.")
+  out$diagnostics$warning <- if (isTRUE(out$diagnostics$boundary_complete))
+    "All Gaussian equality covariance strata searched; numerical global optimality not certified."
+  else "Some covariance strata are unoptimized; this is not a certified restricted maximum."
   out
 }
 
