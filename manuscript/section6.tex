@@ -1,0 +1,544 @@
+% Section 6: Pointwise VPC Inference
+% Requires amsmath, amssymb, amsthm.
+% Uses the notation and theorem environments of Sections 2--5.
+
+\section{Pointwise VPC Significance Testing}
+\label{sec:pointwise_inference}
+
+
+The omnibus hypothesis $\Gamma=0$ rules out
+random-effects variation at all covariate values.
+In contrast, the pointwise null permits variation
+in random-effects directions that do not contribute
+at a specified covariate value. This distinction
+changes the null geometry from a vertex to a ray
+and requires likelihood-ratio calibration that
+accounts for both the vertex and nonzero points
+of the null set.
+
+The general theory of likelihood inference under
+boundary constraints provides the local
+tangent-cone framework
+\citep{self1987asymptotic,shapiro1985}.
+We first establish fixed-parameter limits and
+then examine local null sequences approaching
+the vertex. An endpoint-envelope calibration is established
+through the corresponding Gaussian projection
+experiment.
+
+\subsection{Pointwise hypotheses and their covariance geometry}
+\label{subsec:pointwise_null}
+
+Fix $x_0\in\mathbb R$, and put
+\[
+z_0=(1,x_0)^{\mathsf T},\qquad
+w_0=(-x_0,1)^{\mathsf T}.
+\]
+By Proposition~\ref{prop:zero_vpc}, provided the
+observation-level variance is positive,
+\begin{equation}\label{eq:sec6-pointwise-null}
+\begin{aligned}
+H_0(x_0):\rho(x_0;\theta)=0
+\quad\Longleftrightarrow\quad
+\Gamma z_0=0.
+\end{aligned}
+\end{equation}
+For a positive-semidefinite $2\times2$ matrix this is
+equivalent to
+\begin{equation}\label{eq:sec6-null-ray}
+\begin{aligned}
+K_0(x_0)=\bigl\{\gamma:\ &
+\Gamma(\gamma)=t w_0w_0^{\mathsf T},\\
+& t\geq0\bigr\}.
+\end{aligned}
+\end{equation}
+Write $r_0=\operatorname{vech}(w_0w_0^{\mathsf T})$
+using the covariance-coordinate convention of
+Section~\ref{sec:geometry_asymptotics},
+so that $K_0(x_0)=\mathbb R_+r_0$. The full null parameter
+space is $\Theta_0(x_0)=\Lambda\times K_0(x_0)$ and the
+alternative parameter space is $\Theta=\Lambda\times K$.
+The pointwise null is therefore composite: it contains
+the covariance vertex and nonzero rank-one matrices.
+For a binary covariate, the separate nulls at $x_0=0$
+and $x_0=1$ are distinct; their conjunction is equivalent
+to $\Gamma=0$.
+
+\subsection{Pointwise likelihood-ratio statistic}
+\label{subsec:pointwise_lrt}
+
+Let $\widehat\theta$ maximize the marginal likelihood over
+$\Theta$, and let $\widetilde\theta_{x_0}$ maximize it over
+$\Theta_0(x_0)$. Define
+\begin{equation}\label{eq:sec6-lrt}
+\begin{aligned}
+\mathrm{LRT}_n(x_0)
+&=2\bigl\{\ell_n(\widehat\theta)\\
+&\hspace{1.6em}
+-\ell_n(\widetilde\theta_{x_0})\bigr\}.
+\end{aligned}
+\end{equation}
+The null fit uses one nonnegative variance parameter $t$
+in $\Gamma=t w_0w_0^{\mathsf T}$, while all fixed effects
+and family-specific parameters remain unrestricted within
+$\Lambda$. In particular, the null is not imposed by setting
+$\Gamma=0$ or by applying a Wald approximation to
+$\widehat\rho(x_0)$.
+
+\subsection{Tangent geometry and nested-cone limit}
+\label{subsec:pointwise_tangent}
+
+For $\gamma_0=t_0r_0$, the null tangent cone is
+\begin{equation}\label{eq:sec6-null-tangent}
+T_{K_0(x_0)}(\gamma_0)=
+\begin{cases}
+\operatorname{span}(r_0),&t_0>0,\\
+K_0(x_0),&t_0=0.
+\end{cases}
+\end{equation}
+The alternative tangent cone is the rank-one supporting
+half-space of
+Proposition~\ref{prop:sec4-tangent-cones}
+when $t_0>0$, and $K$ when $t_0=0$.
+Both full tangent cones have the common unrestricted
+nuisance factor $\mathbb R^{p_\lambda}$.
+
+Let $I_0=I(\theta_0)$ denote the normalized full Fisher
+information and $J_0$ its efficient covariance
+information, defined by the Schur complement in
+\eqref{eq:sec4-efficient-information}.
+
+\begin{theorem}\label{thm:sec6-nested-cones}
+Suppose $H_0(x_0)$ holds at a fixed $\theta_0$,
+$J_0\succ0$, and the local asymptotic normality,
+local-set convergence, consistency, and constrained-argmax
+conditions of Section~\ref{sec:geometry_asymptotics}
+hold for both constrained fits.
+Put $T_1=T_K(\gamma_0)$ and
+$T_0=T_{K_0(x_0)}(\gamma_0)$, and set
+$C_j=J_0^{1/2}T_j$. Then
+\begin{equation}\label{eq:sec6-projection-limit}
+\begin{aligned}
+\mathrm{LRT}_n(x_0)
+&\xrightarrow{d}
+\|\Pi_{C_1}(G)\|^2\\
+&\quad-\|\Pi_{C_0}(G)\|^2,\\
+G&\sim N_3(0,I_3).
+\end{aligned}
+\end{equation}
+\end{theorem}
+
+The common nuisance coordinates disappear after profiling
+the local quadratic likelihood. Unlike the omnibus vertex
+test, the second projection in
+\eqref{eq:sec6-projection-limit} is generally nonzero.
+The proof is given in Appendix~\ref{app:pointwise}.
+
+\subsection{Fixed nonzero rank-one and vertex nulls}
+\label{subsec:pointwise_fixed_limits}
+
+\begin{proposition}\label{prop:sec6-rankone-lrt}
+Under the conditions of
+Theorem~\ref{thm:sec6-nested-cones}, if
+$\Gamma_0=t_0w_0w_0^{\mathsf T}$ with $t_0>0$, then
+\begin{equation}\label{eq:sec6-rankone-mixture}
+\mathrm{LRT}_n(x_0)\xrightarrow{d}
+\tfrac12\chi_1^2+\tfrac12\chi_2^2.
+\end{equation}
+\end{proposition}
+
+At a nonzero rank-one point, the null tangent is a line
+contained in the boundary hyperplane of the alternative
+tangent half-space. The line is orthogonal to the half-space
+normal even after efficient-information whitening, so
+removing the common line leaves one unrestricted Gaussian
+coordinate and one one-sided coordinate. Appendix~\ref{app:pointwise-rankone} gives
+the projection calculation. The mixture weights are
+independent of $J_0$.
+
+At $\Gamma_0=0$, the null tangent is instead the ray
+$K_0(x_0)$ and the alternative tangent is $K$. Thus
+\begin{equation}\label{eq:sec6-vertex-limit}
+\begin{aligned}
+T_{\mathrm v}(J_0,x_0)
+&=\|\Pi_{J_0^{1/2}K}(G)\|^2\\
+&\quad-
+\|\Pi_{J_0^{1/2}K_0(x_0)}(G)\|^2.
+\end{aligned}
+\end{equation}
+
+The vertex distribution admits an exact spherical
+integral representation. In particular, its CDF,
+density on $(0,\infty)$, and possible atom at zero
+are given in Appendix~\ref{app:pointwise-vertex-density}.
+These expressions provide a deterministic route
+to numerical evaluation of the vertex reference
+distribution without assuming a finite
+chi-bar-square mixture.
+
+This is not the omnibus statistic of
+Section~\ref{sec:global_lrt} and is
+not, in general, distributed according to
+\eqref{eq:sec6-rankone-mixture}. We make no universal
+chi-bar-square assertion for this difference of projections.
+
+\subsection{Local null sequences approaching the vertex}
+\label{subsec:pointwise_local_sequences}
+
+The fixed-parameter limits do not, by themselves, control
+null sequences whose nonzero covariance component shrinks
+at the $n^{-1/2}$ scale. To describe this regime, let
+$\theta_*=(\lambda_*,0)$ be a vertex parameter and let
+$J_*=J(\theta_*)\succ0$. Define
+\begin{equation}\label{eq:sec6-whitened-cones}
+\begin{gathered}
+C=J_*^{1/2}K,\qquad R=\mathbb R_+e,\\
+e=\frac{J_*^{1/2}r_0}
+{\|J_*^{1/2}r_0\|}.
+\end{gathered}
+\end{equation}
+Consider null sequences
+\begin{equation}\label{eq:sec6-local-sequence}
+\begin{aligned}
+\gamma_n
+&=\frac{a\,r_0}
+{\sqrt n\,\|J_*^{1/2}r_0\|},
+\qquad a\geq0,
+\end{aligned}
+\end{equation}
+with nuisance parameters converging to $\lambda_*$ under
+the local experiment assumptions. Thus $a$ is the
+Fisher-standardized null-ray displacement, not the
+unstandardized variance $t$.
+
+\begin{proposition}\label{prop:sec6-local-limit}
+Suppose the likelihoods and constrained local parameter
+sets admit a joint Gaussian-shift limit along
+\eqref{eq:sec6-local-sequence}, with efficient covariance
+information $J_*$. Then
+\begin{equation}\label{eq:sec6-local-limit}
+\begin{aligned}
+\mathrm{LRT}_n(x_0)&\xrightarrow{d}T_a,\\
+T_a&=\|\Pi_C(G+ae)\|^2\\
+&\quad-\|\Pi_R(G+ae)\|^2,\\
+G&\sim N_3(0,I_3).
+\end{aligned}
+\end{equation}
+The endpoints satisfy
+$T_0\stackrel d=T_{\mathrm v}(J_*,x_0)$
+and
+\begin{equation}\label{eq:sec6-infinity-limit}
+\begin{gathered}
+T_a\xrightarrow{d}T_\infty
+\quad(a\to\infty),\\
+T_\infty\sim
+\tfrac12\chi_1^2+\tfrac12\chi_2^2.
+\end{gathered}
+\end{equation}
+\end{proposition}
+
+The Gaussian-shift representation and tangent
+half-space limit are established in
+Appendices~\ref{app:pointwise-local} and
+\ref{app:pointwise-rankone}.
+The assertion for finite $a$ concerns a local sequence
+and is distinct from the fixed nonzero-rank-one result.
+
+\subsection{Endpoint maximality of the Gaussian null tail}
+\label{subsec:pointwise_endpoint}
+
+The following geometric result supplies a single calibration
+across the entire Gaussian local-null ray. It is stated in
+a form that does not require the special Lorentz
+representation.
+
+\begin{theorem}[Gaussian endpoint maximality]
+\label{thm:sec6-endpoint}
+Let $C\subseteq\mathbb R^d$ be a closed convex cone and
+let $R=\mathbb R_+e\subseteq C$, where $\|e\|=1$.
+For $G\sim N_d(0,I_d)$, set
+\[
+\begin{aligned}
+T_a={}&\|\Pi_C(G+ae)\|^2\\
+&-\|\Pi_R(G+ae)\|^2,
+\qquad a\geq0.
+\end{aligned}
+\]
+For every $u>0$,
+\begin{equation}\label{eq:sec6-endpoint-max}
+\begin{gathered}
+\sup_{a\geq0}\Pr(T_a>u)\\
+=\max\Bigl\{
+\Pr(T_0>u),\\
+\lim_{a\to\infty}\Pr(T_a>u)
+\Bigr\}.
+\end{gathered}
+\end{equation}
+\end{theorem}
+
+The proof in Appendix~\ref{app:pointwise-endpoint} conditions on the Gaussian
+coordinates orthogonal to $e$. On the negative half-line,
+the conditional acceptance profile is log-concave by
+convexity and Pr\'ekopa's theorem; on the positive half-line,
+it is nonincreasing by translation along $e$ inside the
+cone. The resulting profile is unimodal, and Gaussian
+convolution preserves this unimodality.
+
+For the present three-dimensional whitened PSD cone,
+the boundary is smooth away from the vertex, and
+\eqref{eq:sec6-infinity-limit} identifies the positive-ray
+endpoint. Consequently,
+\begin{equation}\label{eq:sec6-pointwise-tail-bound}
+\begin{gathered}
+\Pr(T_a>u)\leq
+\max\{p_{\mathrm v}(u),p_\infty(u)\},\\
+p_{\mathrm v}(u)
+=\Pr\{T_{\mathrm v}(J_*,x_0)>u\},\\
+\begin{aligned}
+p_\infty(u)
+={}&\tfrac12\Pr(\chi_1^2>u)\\
+&+\tfrac12\Pr(\chi_2^2>u).
+\end{aligned}
+\end{gathered}
+\end{equation}
+where $a\geq0$.
+The endpoint bound concerns the limiting Gaussian
+experiment; its transfer to a uniform statement for the
+original GLMM requires additional statistical conditions.
+
+\subsection{Calibration and feasible pointwise testing}
+\label{subsec:pointwise_calibration}
+
+Let $c_{\mathrm v,\alpha}(J,x_0)$ be an upper $\alpha$
+critical value of the vertex statistic in
+\eqref{eq:sec6-vertex-limit}, and let
+$c_{\infty,\alpha}$ be an upper $\alpha$ critical value
+of $\tfrac12\chi_1^2+\tfrac12\chi_2^2$. Define
+\begin{equation}\label{eq:sec6-critical-value}
+\begin{aligned}
+c_{\alpha}^{\mathrm{pw}}(J,x_0)
+=\max\bigl\{
+&c_{\mathrm v,\alpha}(J,x_0),\\
+&c_{\infty,\alpha}
+\bigr\}.
+\end{aligned}
+\end{equation}
+By Theorem~\ref{thm:sec6-endpoint}, the Gaussian experiment
+satisfies
+\begin{equation}\label{eq:sec6-gaussian-size}
+\begin{gathered}
+\sup_{a\geq0}
+\Pr\bigl\{T_a>
+c_{\alpha}^{\mathrm{pw}}(J_*,x_0)\bigr\}\\
+\leq\alpha.
+\end{gathered}
+\end{equation}
+For feasible endpoint-envelope calibration, let
+$\widetilde\lambda_n$ be the nuisance component of the
+pointwise restricted estimator and set
+\begin{equation}\label{eq:sec6-vertex-information}
+\widehat J_{V,n}=J(\widetilde\lambda_n,0).
+\end{equation}
+This vertex-evaluated information is used in the vertex
+reference distribution; the remote-ray reference is
+independent of $J$. Reject $H_0(x_0)$ when
+\begin{equation}\label{eq:sec6-feasible-test}
+\mathrm{LRT}_n(x_0)>
+c_{\alpha}^{\mathrm{pw}}(\widehat J_{V,n},x_0).
+\end{equation}
+The vertex quantile can be evaluated by Gaussian projection
+simulation or deterministic integration over the transformed
+cone. Its calculation must use the difference of two squared
+projection norms, not the omnibus chi-bar-square weights
+of Section~\ref{sec:global_lrt}.
+
+At the vertex and along local null sequences, consistency
+of $\widetilde\lambda_n$ for the vertex nuisance parameter
+makes \eqref{eq:sec6-vertex-information} appropriate. At a
+fixed nonzero null covariance, the limiting LRT is the
+remote-ray mixture, whose cutoff does not depend on the
+information matrix. Uniform validity across both regimes,
+however, requires a stronger approximation than pointwise
+likelihood asymptotics alone.
+
+\begin{theorem}[Conditional uniform calibration]
+\label{thm:sec6-uniform-size}
+Fix $x_0\in\mathbb R$, $0<\alpha<1$, and a compact
+null class
+\[
+\Theta_0^T=\{(\lambda,t r_0):
+\lambda\in\Lambda_0,\ 0\le t\le T\},\qquad T<\infty.
+\]
+Assume $J_V(\lambda):=J(\lambda,0)$ is continuous and
+positive definite on a neighborhood of $\Lambda_0$.
+For $\theta=(\lambda,t r_0)\in\Theta_0^T$, put
+\begin{equation}\label{eq:sec6-uniform-displacement}
+\begin{aligned}
+ a_n(\theta)&=\sqrt n\,t\,
+ \|J_V(\lambda)^{1/2}r_0\|,\\
+ e_\lambda&=\frac{J_V(\lambda)^{1/2}r_0}
+ {\|J_V(\lambda)^{1/2}r_0\|}.
+\end{aligned}
+\end{equation}
+Let $T_a^{J_V(\lambda)}$ denote the Gaussian
+cone-versus-ray statistic in
+\eqref{eq:sec6-local-limit}, with $J_*$ replaced by
+$J_V(\lambda)$ and displacement $a$; at $a=\infty$
+use the remote-ray limit in
+\eqref{eq:sec6-infinity-limit}.
+
+Suppose the restricted nuisance estimator and the
+vertex-information plug-in are well defined and the
+following \emph{uniform rejection-probability approximation}
+holds for the feasible test in
+\eqref{eq:sec6-feasible-test}:
+\begin{equation}\label{eq:sec6-uniform-approx}
+\begin{aligned}
+\sup_{\theta\in\Theta_0^T}\Bigl|
+&P_\theta\{\mathrm{LRT}_n(x_0)>
+ c_\alpha^{\mathrm{pw}}(\widehat J_{V,n},x_0)\}\\
+-&P\{T_{a_n(\theta)}^{J_V(\lambda)}>
+ c_\alpha^{\mathrm{pw}}(J_V(\lambda),x_0)\}
+\Bigr|\longrightarrow0.
+\end{aligned}
+\end{equation}
+Since $c_{\infty,\alpha}>0$ for $0<\alpha<1$,
+the envelope critical value is positive. Then
+\begin{equation}\label{eq:sec6-uniform-size}
+\boxed{\displaystyle
+\limsup_{n\to\infty}\sup_{\theta\in\Theta_0^T}
+P_\theta\{\mathrm{LRT}_n(x_0)>
+ c_\alpha^{\mathrm{pw}}(\widehat J_{V,n},x_0)\}
+\le\alpha.}
+\end{equation}
+\end{theorem}
+
+The uniform approximation
+\eqref{eq:sec6-uniform-approx} is an additional statistical
+assumption for a general marginal model, not a consequence
+of fixed-parameter LAN. Appendix~\ref{app:pointwise-calibration}
+proves the conditional result. For the four response families
+and informative compact fitted model classes specified in
+Subsection~\ref{subsec:sec4-compact-uniform}, the necessary
+likelihood and moving-parameter premises are verified by
+the family-specific and uniform likelihood arguments
+collected in the supplementary proofs. The following result
+states the consequent unconditional-in-regularity (but
+model-restricted) uniform size assertion.
+
+\subsection{Verified uniform calibration for the four GLMM families}
+\label{subsec:sec6-four-family-uniform}
+
+The preceding conditional theorem is useful for models
+beyond the four families considered here. In the Gaussian
+identity-link, Poisson log-link, NB2 log-link, and compound
+Poisson--Gamma (CPG) log-link models, its statistical
+regularity conditions can instead be established from
+explicit design and compactness restrictions.
+
+\begin{theorem}[Four-family uniform calibration]
+\label{thm:sec6-four-family-uniform}
+Let the independent clusters comprise a fixed finite number
+of bounded deterministic design types with convergent
+frequencies. Assume positive limiting frequency for an
+identifying design or for the specified full-rank grouped
+designs. In the basic layouts, the Gaussian family has an
+identifiable fixed-effect design, at least three observations
+and rank-two random-effects design; Poisson and NB2 use two
+distinct covariate levels; and CPG has three conditionally
+independent same-level replicates at $x=0$ and two at $x=1$.
+Equal-level replicates have the same fixed, random-effect,
+and family-specific predictors. The dimension of the full
+nuisance vector is fixed and finite, and the identifying
+design has full column rank for that parameterization.
+
+Let the nuisance parameter and covariance ranges satisfy
+the buffered compact restrictions of
+\eqref{eq:sec4-compact-classes}, with exact global marginal
+likelihood maximization over the enlarged fitted domain
+$\Theta^+$. The Gaussian residual variance and NB2 size
+remain in compact positive intervals. For CPG, both
+$\phi$ and the power parameter $\kappa$ are unknown,
+with $\phi$ in a compact positive interval and
+$\kappa$ in a compact subinterval of $(1,2)$.
+Fix $x_0\in\mathbb R$, $0<\alpha<1$, and
+$\Theta_0^T\subset\mathcal C$ as in
+Theorem~\ref{thm:sec6-uniform-size}; in particular,
+$T\,\|w_0\|^2<M$ so that its upper covariance boundary
+is inactive in the fitted model. Let
+$\widetilde\lambda_n$ be the nuisance component of the
+pointwise-null global maximizer, and evaluate
+$\widehat J_{V,n}=J(\widetilde\lambda_n,0)$ as
+\emph{model expected} efficient information at the vertex.
+Then
+\begin{equation}\label{eq:sec6-four-family-size}
+\boxed{\displaystyle
+\limsup_{n\to\infty}\ \sup_{\theta\in\Theta_0^T}
+P_\theta\!\left\{
+\mathrm{LRT}_n(x_0)>
+ c_{\alpha}^{\mathrm{pw}}(\widehat J_{V,n},x_0)
+\right\}\leq\alpha.}
+\end{equation}
+The conclusion permits $\Gamma=0$, fixed nonzero
+rank-one null covariances, and all intermediate null
+sequences within $\Theta_0^T$. It does not assume that
+the CPG dispersion or power is known.
+\end{theorem}
+
+\begin{proof}
+The informative designs, admissible compact ranges,
+Gaussian covariance heat-derivative extension, and
+family-specific moment envelopes establish common
+likelihood differentiation and information identities,
+identification, and uniformly positive-definite full
+information. Compact-domain global likelihood localization
+and a true-parameter-centered quadratic expansion then
+yield uniform root-$n$ localization of both constrained
+maximizers, a uniform score central limit theorem, and
+consistent nuisance and information estimation.
+
+For an arbitrary sequence of true null parameters
+$\theta_n=(\lambda_n,t_n r_0)\in\Theta_0^T$, take a
+subsequence along which $\lambda_n\to\lambda_*$ and
+$\sqrt n\,t_n\to\tau\in[0,\infty]$.
+If $\tau<\infty$, then $t_n\to0$ and the exact moving
+local covariance sets converge to $K-\tau r_0$ and
+$K_0(x_0)-\tau r_0$, with efficient information
+$J(\lambda_*,0)$. After Fisher whitening this is the
+finite-displacement cone-versus-ray Gaussian experiment;
+Theorem~\ref{thm:sec6-endpoint} bounds its rejection
+tail by the two-endpoint envelope.
+If $\tau=\infty$, the moving sets converge to the
+rank-one supporting half-space and null line. The
+likelihood-ratio limit is
+$\tfrac12\chi_1^2+\tfrac12\chi_2^2$, regardless of
+whether $t_n$ converges to a positive value or approaches
+zero more slowly than $n^{-1/2}$. Its upper-tail critical
+value is no larger than
+$c_{\alpha}^{\mathrm{pw}}(J(\lambda_*,0),x_0)$.
+Uniform nuisance consistency, continuity of the
+positive envelope critical value, and Gaussian
+anti-concentration at positive thresholds justify
+replacement by $\widehat J_{V,n}$. Every subsequential
+rejection probability has limit superior at most
+$\alpha$, which proves \eqref{eq:sec6-four-family-size}
+by contradiction.
+\end{proof}
+
+\paragraph{Information evaluation and implementation scope.}
+The vertex matrix in \eqref{eq:sec6-vertex-information}
+is expected information evaluated under the model with
+covariance set to zero and nuisance parameter
+$\widetilde\lambda_n$. A sample observed Hessian at a
+\emph{false} zero covariance need not estimate that matrix
+when the true null covariance is nonzero. A separately
+consistent estimate of efficient information at the true
+parameter, obtained from a consistent full or pointwise-null
+fit, may also be used with the corresponding endpoint
+calibration. The theorem concerns the exact marginal
+likelihood and mathematically specified critical values.
+Numerically fitted log-likelihood suprema must approximate
+the exact full and restricted global suprema with uniform
+$o_P(1)$ errors, and numerical critical-value errors must
+also vanish uniformly, before the same size guarantee
+can be claimed for a software implementation.
