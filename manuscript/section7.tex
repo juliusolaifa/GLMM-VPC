@@ -1,0 +1,1085 @@
+% Revised Section 7 and Appendix H. Requires amsmath, amssymb, amsthm.
+\section{Testing Equality and Directional Differences in VPCs}
+\label{sec:equality_vpc}
+
+The pointwise null in Section~\ref{sec:pointwise_inference} asks whether
+random effects contribute variation at a specified covariate value. A
+different question is whether the variance partition coefficient (VPC)
+is unchanged between two values. The equality null generally permits
+nonzero random effects and has a different boundary geometry. We develop likelihood-ratio tests for equality and directional
+contrasts, characterize their fixed-stratum Gaussian limits, and provide
+conservative compact-uniform calibrations on verified GLMM classes.
+The latter allow arbitrary positive-definite Fisher-information coupling
+and do not require an unproved least-favorable endpoint principle.
+
+\subsection{Hypothesis and constrained likelihood}
+\label{subsec:eq_hypothesis}
+Let $x_0\ne x_1$ be fixed and write
+$\theta=(\xi^{\mathsf T},\gamma^{\mathsf T})^{\mathsf T}$,
+where $\xi$ includes fixed effects and all family-specific parameters
+and $\gamma=\operatorname{vech}(\Gamma)$, with
+$\Gamma\in\mathbb S_+^2$. Define
+\begin{equation}\label{eq:eq_D}
+ D(\theta)=\rho(x_1;\theta)-\rho(x_0;\theta).
+\end{equation}
+We test
+\begin{equation}\label{eq:eq_H0}
+ H_{0,E}:D(\theta)=0
+ \quad\text{against}\quad H_{1,E}:D(\theta)\ne0.
+\end{equation}
+Let $\widehat\theta$ maximize the marginal log-likelihood over
+$\Theta=\Xi\times K$, where
+$K=\operatorname{vech}(\mathbb S_+^2)$, and let
+$\widetilde\theta_E$ maximize it over
+$\Theta_E=\{\theta\in\Theta:D(\theta)=0\}$. The statistic is
+\begin{equation}\label{eq:eq_LRT}
+ \mathrm{LRT}_{E,n}=2\{\ell_n(\widehat\theta)
+                  -\ell_n(\widetilde\theta_E)\}.
+\end{equation}
+The null fit imposes the exact nonlinear equality in
+\eqref{eq:eq_H0}, not merely its linearization.
+
+For the random-intercept-and-slope design, put
+$z(x)=(1,x)^{\mathsf T}$ and
+$v(x;\Gamma)=z(x)^{\mathsf T}\Gamma z(x)$.
+Write $\rho(x;\theta)=R_x(v(x;\Gamma),\xi)$,
+where $R_x(0,\xi)=0$ and $R_x$ is differentiable at zero.
+For $x_0=0$ and $x_1=1$,
+\begin{equation}\label{eq:eq_D01}
+\begin{aligned}
+ D(\theta)={}&R_1(\gamma_{11}+2\gamma_{12}
+                     +\gamma_{22},\xi)\\
+ &-R_0(\gamma_{11},\xi).
+\end{aligned}
+\end{equation}
+
+\subsection{Vertex null: a covariance wedge}
+\label{subsec:eq_vertex_geometry}
+At $\Gamma=0$, assume
+\begin{equation}\label{eq:eq_rkappa}
+ r_j=\partial_vR_j(0,\xi_0)>0,
+ \qquad \kappa=r_0/r_1>0.
+\end{equation}
+Since $R_x(0,\xi)\equiv0$, the derivative of $D$ with respect
+to $\xi$ vanishes at the vertex. The linearized equality is
+\begin{equation}\label{eq:eq_linear_vertex}
+ 2H_{12}+H_{22}=(\kappa-1)H_{11}.
+\end{equation}
+Under the smoothness and interior-nuisance conditions
+of Theorem~\ref{thm:eq_vertex_tangent_regularity},
+the nonlinear equality-constrained parameter space
+has the exact Bouligand tangent cone
+\[
+T_{\Theta_E}(\theta_0)
+=
+\mathbb R^{\dim\xi}
+\times\operatorname{vech}(W_\kappa),
+\]
+where the covariance component is
+\begin{equation}\label{eq:eq_wedge}
+ W_\kappa=\{H\succeq0:\;
+ 2H_{12}+H_{22}=(\kappa-1)H_{11}\}.
+\end{equation}
+The tangent-cone identity is established constructively
+in Appendix~\ref{app:eq_wedge_proof}, rather than
+being assumed from the linearized equality alone.
+With
+\begin{equation}\label{eq:eq_wpm}
+ w_\pm=(1,-1\pm\sqrt\kappa)^{\mathsf T},
+\end{equation}
+the linearized cone has the exact representation
+\begin{equation}\label{eq:eq_wedge_generators}
+ W_\kappa=\operatorname{cone}
+ \{w_+w_+^{\mathsf T},w_-w_-^{\mathsf T}\}.
+\end{equation}
+Thus the vertex null has a two-dimensional covariance wedge,
+rather than the single ray arising in pointwise zero-VPC testing.
+
+\subsection{Efficient-information Gaussian limit}
+\label{subsec:eq_gaussian}
+Assume joint local asymptotic normality (LAN), nonsingular
+normalized full Fisher information $I_0$, and the constrained
+argmax and tangent-set regularity conditions in
+Appendix~\ref{app:equality_proofs}. Partition $I_0$
+conformably with $\theta=(\xi,\gamma)$ and define
+\begin{equation}\label{eq:eq_J}
+ J_0=I_{\gamma\gamma,0}
+ -I_{\gamma\xi,0}I_{\xi\xi,0}^{-1}
+  I_{\xi\gamma,0}.
+\end{equation}
+At the vertex let $B=J_0^{1/2}$, and write
+$C=BK$ and $W=B\operatorname{vech}(W_\kappa)$.
+For $G\sim N_3(0,I_3)$, the fixed-vertex limit is
+\begin{equation}\label{eq:eq_vertex_limit}
+ \mathrm{LRT}_{E,n}\ \Longrightarrow\
+ T_0:=\|\Pi_C(G)\|^2-\|\Pi_W(G)\|^2.
+\end{equation}
+For a local null sequence with
+$\sqrt n\,B\gamma_n\to\mu\in W$ and a common limiting
+information matrix, the corresponding Gaussian limit is
+\begin{equation}\label{eq:eq_local_limit}
+ T_\mu=\|\Pi_C(G+\mu)\|^2
+       -\|\Pi_W(G+\mu)\|^2.
+\end{equation}
+This shifted expression describes vertex-local null sequences,
+subject to the stated moving-parameter regularity conditions;
+it does not describe every fixed nonzero covariance matrix.
+
+\subsection{Exact spherical-angular law at the vertex}
+\label{subsec:eq_vertex_angular}
+The fixed-vertex distribution in \eqref{eq:eq_vertex_limit}
+can be evaluated by deterministic angular integration. Define,
+for $u\in S^2=\{u\in\mathbb R^3:\|u\|=1\}$,
+\begin{equation}\label{eq:eq_vertex_angular_function}
+ d_E(u)=\|\Pi_C(u)\|^2-\|\Pi_W(u)\|^2\ge0.
+\end{equation}
+The inequality follows from $W\subseteq C$.
+Let $\overline F_{\chi_3^2}$ denote the survival function
+of a chi-square variable with three degrees of freedom.
+Then, for $t>0$,
+\begin{equation}\label{eq:eq_vertex_angular_tail}
+ \boxed{\displaystyle
+ \Pr(T_0>t)=\frac{1}{4\pi}
+ \int_{\{u\in S^2:d_E(u)>0\}}
+ \overline F_{\chi_3^2}\!\left(\frac{t}{d_E(u)}\right)
+ \,d\omega(u).}
+\end{equation}
+Equivalently, writing
+$u(\theta,\phi)=(\sin\phi\cos\theta,
+\sin\phi\sin\theta,\cos\phi)^{\mathsf T}$,
+\begin{equation}\label{eq:eq_vertex_spherical_tail}
+\begin{aligned}
+ \Pr(T_0>t)=\frac{1}{4\pi}
+ \int_0^{2\pi}\!\int_0^\pi
+ &\mathbf1_{\{d_E(u(\theta,\phi))>0\}}\\
+ &\times\overline F_{\chi_3^2}\!\left(
+ \frac{t}{d_E(u(\theta,\phi))}\right)
+ \sin\phi\,d\phi\,d\theta.
+\end{aligned}
+\end{equation}
+The distribution may have an atom at zero, with mass
+\begin{equation}\label{eq:eq_vertex_atom}
+ \Pr(T_0=0)=\frac{1}{4\pi}
+ \int_{S^2}\mathbf1_{\{d_E(u)=0\}}\,d\omega(u).
+\end{equation}
+For $t>0$ its density is
+\begin{equation}\label{eq:eq_vertex_density}
+ f_{T_0}(t)=\frac{1}{4\pi}
+ \int_{\{d_E(u)>0\}}
+ \frac{1}{d_E(u)}
+ f_{\chi_3^2}\!\left(\frac{t}{d_E(u)}\right)
+ \,d\omega(u).
+\end{equation}
+Appendix~\ref{app:eq_vertex_angular_proof} proves these
+identities and gives an explicit two-generator projection
+algorithm for $W$. Thus the fixed-vertex tail and critical
+values can be computed by spherical quadrature, without
+simulation of Gaussian vectors. This exact fixed-vertex law
+must not be substituted for the uniform Gaussian-local bound
+in Section~\ref{subsec:eq_calibration}: the latter covers
+all null displacements $\mu\in W$, not only $\mu=0$.
+
+\subsection{Nonzero rank-one null and angular law}
+\label{subsec:eq_rankone}
+Suppose $\Gamma_0$ has rank one and a positive eigenvalue,
+$D(\theta_0)=0$, and the full-parameter gradient
+$a=\nabla_\theta D(\theta_0)$ is nonzero. Let $n$ denote the
+full-parameter inward normal to the active PSD boundary,
+so the alternative tangent is $\{h:n^{\mathsf T}h\ge0\}$.
+Assume the null tangent is exactly
+\begin{equation}\label{eq:eq_rankone_tangent}
+ \{h:n^{\mathsf T}h\ge0,\ a^{\mathsf T}h=0\}.
+\end{equation}
+Define the normalized Fisher-whitened normal inner product
+\begin{equation}\label{eq:eq_angle}
+ c=\frac{a^{\mathsf T}I_0^{-1}n}
+ {\sqrt{(a^{\mathsf T}I_0^{-1}a)
+             (n^{\mathsf T}I_0^{-1}n)}}.
+\end{equation}
+When $|c|<1$, whitening and removal of the common lineality
+space reduce the nested tangent-cone problem to a half-plane
+versus a ray in two dimensions. Choose coordinates with
+$H=\{(z_1,z_2):z_2\ge0\}$ and the whitened equality normal
+$(\sqrt{1-c^2},c)^{\mathsf T}$. The equality line intersects
+$H$ in the ray generated by
+$(-c,\sqrt{1-c^2})^{\mathsf T}$.
+Consequently its angle from the positive horizontal axis is
+$\omega=\arccos(-c)\in(0,\pi)$.
+For independent $Z_1,Z_2\sim N(0,1)$, the limiting statistic is
+\begin{equation}\label{eq:eq_angular_law}
+\begin{aligned}
+ T_\omega={}&Z_1^2+(Z_2)_+^2\\
+ &-(Z_1\cos\omega+Z_2\sin\omega)_+^2,
+\end{aligned}
+\end{equation}
+where $y_+=\max(y,0)$. Reflection symmetry implies that
+$\omega$ and $\pi-\omega$ give the same law. When $c=0$,
+$T_\omega\sim\chi_1^2$.
+
+For $t>0$, define
+\begin{equation}\label{eq:eq_homega}
+ h_\omega(\phi)=\cos^2\phi+(\sin\phi)_+^2
+                  -(\cos(\phi-\omega))_+^2.
+\end{equation}
+The upper-tail probability is
+\begin{equation}\label{eq:eq_angular_tail}
+ \Pr(T_\omega>t)=\frac1{2\pi}
+ \int_{\{\phi\in[0,2\pi):h_\omega(\phi)>0\}}
+ \exp\!\left\{-\frac{t}{2h_\omega(\phi)}\right\}
+ \,d\phi.
+\end{equation}
+At $|c|=1$, the first-order tangent description may be
+singular; the boundary-normal formula alone does not justify
+an LRT limit without further analysis.
+
+\subsection{Conservative Gaussian calibration under arbitrary information coupling}
+\label{subsec:eq_calibration}
+We now construct coordinates that simultaneously preserve the full
+PSD alternative and put the linearized equality null in canonical form.
+Let $P_\kappa=[w_+\ \ w_-]$, with $w_\pm$ as in
+\eqref{eq:eq_wpm}. Since $\det P_\kappa=-2\sqrt\kappa\ne0$,
+the congruence map
+\begin{equation}\label{eq:eq_canonical_map}
+ \Gamma=P_\kappa
+ \begin{pmatrix}a&z\\z&b\end{pmatrix}P_\kappa^{\mathsf T}
+\end{equation}
+is an invertible linear reparameterization of the covariance
+coordinates. Congruence preserves positive semidefiniteness, and
+substitution into the vertex contrast derivative
+\eqref{eq:eq_linear_vertex} shows that the linearized equality is
+exactly $z=0$. Thus the transformed alternative and null are
+\begin{equation}\label{eq:eq_canonical_cones}
+ \begin{aligned}
+ C_0&=\{(a,b,z):a\ge0,\ b\ge0,\ ab\ge z^2\},\\
+ W_0&=\{(a,b,0):a,b\ge0\}.
+ \end{aligned}
+\end{equation}
+Define the invertible $3\times3$ matrix $L_\kappa$ by
+$\operatorname{vech}(\Gamma)=L_\kappa(a,b,z)^{\mathsf T}$,
+using the same ordering of $\operatorname{vech}$ as in $J_0$.
+The information in canonical coordinates is
+\begin{equation}\label{eq:eq_canonical_Q}
+ Q=L_\kappa^{\mathsf T}J_0L_\kappa\succ0.
+\end{equation}
+This is a congruence transformation of the efficient information,
+not the untransformed matrix $J_0$. In particular, the bounds below
+apply to the precise cone pair in \eqref{eq:eq_canonical_cones},
+not to an arbitrary image of the PSD cone.
+For $X\sim N_3((a,b,0),Q^{-1})$ define
+\begin{equation}\label{eq:eq_Qstat}
+ \begin{aligned}
+ T_Q(X)&=d_Q^2(X,W_0)-d_Q^2(X,C_0),\\
+ F_{Q,t}(a,b)&=\Pr\{T_Q(X)>t\}.
+ \end{aligned}
+\end{equation}
+The general Gaussian-local worst-case survival probability is
+$S_Q^\star(t)=\sup_{a,b\geq0}F_{Q,t}(a,b)$.
+
+\paragraph{A baseline distance bound.}
+For $W\subseteq C$ closed convex cones and $\mu\in W$,
+\begin{equation}\label{eq:eq_pathwise_bound}
+ 0\leq T_\mu\leq d^2(G,W)\quad\text{almost surely},\qquad G\sim N_3(0,I_3).
+\end{equation}
+For a planar wedge with opening angle $\vartheta$ this distance has
+survival function
+\begin{equation}\label{eq:eq_old_bound}
+ B_Q^{\rm old}(t)=\frac{\vartheta}{2\pi}\overline F_{\chi_1^2}(t)
+ +\frac12\overline F_{\chi_2^2}(t)
+ +\frac{\pi-\vartheta}{2\pi}\overline F_{\chi_3^2}(t).
+\end{equation}
+Here $\vartheta=\arccos\{Q_{ab}/\sqrt{Q_{aa}Q_{bb}}\}$,
+which is the angle between the two null generators in the $Q$ metric.
+
+\paragraph{A sharper coupling-sensitive envelope.}
+Partition the transformed information as
+\begin{equation}\label{eq:eq_Qblocks}
+ \begin{aligned}
+ Q&=\begin{pmatrix}A&h\\h^{\mathsf T}&q\end{pmatrix}\succ0,\\
+ D&=q-h^{\mathsf T}A^{-1}h>0,\\
+ \kappa_Q^2&=\frac{h^{\mathsf T}A^{-1}h}{D},
+ \quad L=\kappa_Q.
+ \end{aligned}
+\end{equation}
+The subscript on $\kappa_Q$ distinguishes information coupling
+from the VPC derivative ratio $\kappa=r_0/r_1$. The latter is a
+local VPC derivative ratio, not the CPG family power parameter.
+Set $K_A=A^{1/2}\mathbb R_+^2$ and
+$d=A^{-1/2}h/\sqrt D$; define the orientation constants
+$\lambda_+=d(d,K_A)$ and $\lambda_-=d(-d,K_A)$, where $d(\cdot,K_A)$
+denotes Euclidean distance. Let $V\sim N(0,1)$ and, independently,
+$R^2\sim w_0\chi_0^2+w_1\chi_1^2+w_2\chi_2^2$ with
+\begin{equation}\label{eq:eq_wmix}
+ (w_0,w_1,w_2)=\left(\frac{\vartheta}{2\pi},\frac12,
+ \frac{\pi-\vartheta}{2\pi}\right).
+\end{equation}
+For $v,r\geq0$ and $0\leq\lambda\leq L$, put
+\begin{equation}\label{eq:eq_Blambda}
+ \begin{aligned}
+ B_{L,\lambda}(v,r)&=v^2+r^2-\frac{(r-\lambda v)_+^2}{1+L^2},\\
+ J_Q(t)&=\frac12\sum_{\epsilon\in\{+,-\}}
+ \Pr\{B_{L,\lambda_\epsilon}(|V|,R)>t\}.
+ \end{aligned}
+\end{equation}
+Define $p_1(t)=\overline F_{\chi_1^2}(t)$ and $M=1+\kappa_Q^2$.
+A complementary closed-form envelope is
+\begin{equation}\label{eq:eq_Hbound}
+ \begin{split}
+ H_Q(t)={}&\frac12p_1(t)+\frac12p_1(t/M)\\
+ &+\frac{\pi-\vartheta}{2\pi}\frac{\kappa_Q}{\sqrt M}
+ \exp\!\left(-\frac{t}{2M}\right)
+ \left\{2\Phi\!\left(\frac{\kappa_Q\sqrt t}{\sqrt M}\right)-1\right\}.
+ \end{split}
+\end{equation}
+\begin{theorem}[Improved Gaussian-local calibration]\label{thm:eq_improved}
+For every fixed $Q\succ0$, $t>0$, and $(a,b)\in\mathbb R_+^2$,
+\begin{equation}\label{eq:eq_improved}
+ F_{Q,t}(a,b)\leq \mathcal U_Q(t):=\min\{J_Q(t),H_Q(t)\}
+ <B_Q^{\rm old}(t).
+\end{equation}
+The function $\mathcal U_Q$ is continuous and strictly decreasing from
+one to zero on $t\geq0$. Thus for $\alpha\in(0,1)$ the unique positive
+solution $c_\alpha(Q)$ of $\mathcal U_Q(c_\alpha(Q))=\alpha$
+satisfies $\sup_{a,b\geq0}\Pr\{T_Q>c_\alpha(Q)\}\leq\alpha$.
+The critical value is continuous in $Q\succ0$.
+\end{theorem}
+For this \emph{vertex-local linear chart}, $Q$ is constructed from
+the vertex information and derivative ratio $\\kappa$. This is not a
+valid prescription for evaluating the same information matrix at an
+arbitrary nonzero covariance. The exact nuisance-dependent chart
+introduced below gives the appropriate transformed metric across ranks.
+Theorem~\ref{thm:eq_improved} is a result for the Gaussian experiment.
+Its proof, including the orientation refinement and the closed-form bound,
+is in Appendix~\ref{app:eq_improved_proof}. The general four-endpoint
+identity is not assumed. The two upper bounds $J_Q$ and $H_Q$ are
+separately valid, but only the orientation bound $J_Q$ is guaranteed
+to improve $B_Q^{\rm old}$ strictly; $H_Q$ need not do so on its own.
+The minimum in \eqref{eq:eq_improved} retains the stated improvement.
+
+\paragraph{Exact information subclasses and the endpoint question.}
+Define $E_Q(t)$ as the maximum of the vertex, two rank-one escape,
+and interior escape survival limits. The rank-one endpoint theorem and
+Schur-complement limits identify these four quantities. The equality
+$S_Q^\star(t)=E_Q(t)$ is established if $h=0$ (the covariance contrast
+is information-orthogonal to both variance coordinates) and also if
+$Q_{ab}=Q_{bz}=0$, or the swapped case $Q_{ab}=Q_{az}=0$.
+In the latter class, writing $s=-Q_{az}/\sqrt{Q_{aa}Q_{zz}}$,
+\begin{equation}\label{eq:eq_isolated_exact}
+ S_Q^\star(t)=\max\{S_R(t;0,s),\overline F_{\chi_1^2}(t)\}.
+\end{equation}
+The corresponding exact-case arguments are summarized in
+Appendix~\ref{app:eq_exact_classes}.
+For arbitrary coupled $Q$, however, the finite-displacement inequality
+$F_{Q,t}(a,b)\leq E_Q(t)$ remains an \emph{open conjecture}.
+The escape theorem excludes an obstruction at infinity but not at a
+finite interior or boundary-ray displacement.
+
+\paragraph{From the Gaussian experiment to the GLMM.}
+At a fixed vertex-local null sequence, convergence of the joint
+likelihood-ratio statistic and a consistent $Q$ estimator transfers
+this Gaussian bound through continuity at its positive critical value.
+That statement alone is not uniform across covariance ranks. The
+exact nuisance-dependent chart and the uniform likelihood argument in
+Subsection~\ref{subsec:sec7-uniform-contrast} supply the corresponding
+compact-uniform conclusion on the verified four-family classes.
+
+\subsection{Implementation and scope of validity}
+\label{subsec:eq_implementation}
+Implementation fits the unrestricted and exact nonlinearly
+constrained marginal likelihoods and computes
+\eqref{eq:eq_LRT}. At a fixed vertex, the efficient information
+and wedge generators determine the exact angular law
+\eqref{eq:eq_vertex_angular_tail}; deterministic spherical
+quadrature provides its tail probabilities and quantiles.
+For conservative calibration over vertex-local null shifts,
+compute the transformed information $Q$ and use the sharper
+critical value from Theorem~\ref{thm:eq_improved}.
+At a fixed nonzero rank-one null, the angular law
+\eqref{eq:eq_angular_law} is the appropriate fixed-parameter
+limit under the stated transversality and tangent regularity
+conditions. At a fixed positive-definite null, the regular
+equality LRT has a $\chi_1^2$ limit when $\nabla D\ne0$.
+
+Theorem~\ref{thm:eq_improved} controls the Gaussian experiment.
+A single compact-uniform GLMM rule is given below in
+Theorem~\ref{thm:sec7-uniform-contrasts}; it uses the
+\emph{full-information-transformed} metric at the true covariance,
+not the original vertex-information plug-in at every rank.
+The arbitrary-coupling four-endpoint identity remains open as a
+question of sharper calibration, not of conservative test validity.
+
+
+\subsection{Directional inference for VPC differences}
+\label{sec:directional-vpc-difference}
+
+The equality test developed in Sections 7.1--7.6 assesses
+whether the VPC changes between two covariate values.
+In applications, the direction of that change may itself be
+of scientific interest. We therefore consider the one-sided
+hypotheses
+\begin{equation}
+H_{0,+}:D(\theta)\leq 0
+\qquad\text{versus}\qquad
+H_{1,+}:D(\theta)>0,
+\label{eq:directional-hypotheses}
+\end{equation}
+where
+\begin{equation*}
+D(\theta)
+=
+\rho(x_1;\theta)-\rho(x_0;\theta).
+\end{equation*}
+The reverse-direction test interchanges the inequalities.
+
+Let
+\begin{equation*}
+\Theta_-
+=
+\left\{
+\theta\in\Theta:
+D(\theta)\leq 0
+\right\},
+\end{equation*}
+and let $\widehat{\theta}_-$ maximize the marginal
+log-likelihood over $\Theta_-$. With $\widehat{\theta}$
+denoting the unrestricted constrained MLE over
+$\Theta=\Xi\times K$, define
+\begin{equation}
+\mathrm{LRT}_{+,n}
+=
+2\left\{
+\ell_n(\widehat{\theta})
+-
+\ell_n(\widehat{\theta}_-)
+\right\}.
+\label{eq:directional-lrt}
+\end{equation}
+The restricted likelihood imposes the exact nonlinear
+inequality $D(\theta)\leq 0$. The linearized constraints
+below are used only to characterize local asymptotic
+distributions.
+
+\paragraph{Vertex null geometry.}
+
+Consider $x_0=0$ and $x_1=1$, and let
+$\theta_*=(\xi_*^\top,0^\top)^\top$ be a covariance-vertex
+parameter. Retain the notation
+\begin{equation*}
+r_j
+=
+\partial_v R_j(0,\xi_*)>0,
+\qquad
+\kappa
+=
+\frac{r_0}{r_1}
+\end{equation*}
+from Section 7.2. By Appendix~\ref{app:eq_wedge_proof}, the first-order
+contrast derivative along a feasible covariance
+direction $H$ is
+\begin{equation}
+\dot{D}_{\theta_*}(0,H)
+=
+r_1
+\left\{
+2H_{12}+H_{22}
+-
+(\kappa-1)H_{11}
+\right\}.
+\label{eq:directional-vertex-derivative}
+\end{equation}
+
+Define the directional covariance cones
+\begin{align}
+K_-(\kappa)
+&=
+\left\{
+H\succeq 0:
+2H_{12}+H_{22}
+\leq
+(\kappa-1)H_{11}
+\right\},
+\label{eq:directional-negative-cone}
+\\
+K_+(\kappa)
+&=
+\left\{
+H\succeq 0:
+2H_{12}+H_{22}
+\geq
+(\kappa-1)H_{11}
+\right\}.
+\label{eq:directional-positive-cone}
+\end{align}
+These are closed convex cones satisfying
+\begin{align}
+K_-(\kappa)\cup K_+(\kappa)
+&=
+\mathbb{S}_+^2,
+\\
+K_-(\kappa)\cap K_+(\kappa)
+&=
+W_\kappa,
+\end{align}
+where $W_\kappa$ is the equality wedge in \eqref{eq:eq_wedge}.
+
+The identification of $K_-(\kappa)$ as the covariance
+tangent cone to the exact directional null requires
+tangential regularity. The next proposition states the generic
+fixed-parameter limit under that condition. For the four
+strictly monotone VPC links, the exact chart in
+Subsection~\ref{subsec:sec7-exact-chart} verifies this geometry,
+including at the covariance vertex.
+
+\begin{proposition}[Directional vertex limit]
+\label{prop:directional-vertex-limit}
+
+Suppose the joint LAN, information nonsingularity,
+constrained-argmax, and local-set convergence conditions
+of Section 4 hold at $\theta_*$. Assume additionally
+that the covariance tangent cone of $\Theta_-$ at
+$\theta_*$ is $K_-(\kappa)$, after removal of the
+unrestricted nuisance coordinates.
+
+Let $J_*$ be the efficient covariance information and
+define
+\begin{equation*}
+C
+=
+J_*^{1/2}K,
+\qquad
+C_-
+=
+J_*^{1/2}
+\operatorname{vech}
+\left\{
+K_-(\kappa)
+\right\}.
+\end{equation*}
+
+Then
+\begin{equation}
+\mathrm{LRT}_{+,n}
+\xrightarrow{d}
+T_{+,0}
+=
+\left\|
+\Pi_C(G)
+\right\|^2
+-
+\left\|
+\Pi_{C_-}(G)
+\right\|^2,
+\qquad
+G\sim N_3(0,I_3).
+\label{eq:directional-vertex-limit}
+\end{equation}
+
+For local directional-null sequences satisfying
+\begin{equation*}
+\sqrt{n}\,
+J_*^{1/2}\gamma_n
+\longrightarrow
+\mu\in C_-,
+\end{equation*}
+under the corresponding joint Gaussian-shift and
+local-set conditions, the limiting statistic is
+\begin{equation}
+T_{+,\mu}
+=
+\left\|
+\Pi_C(G+\mu)
+\right\|^2
+-
+\left\|
+\Pi_{C_-}(G+\mu)
+\right\|^2.
+\label{eq:directional-shift-limit}
+\end{equation}
+
+\end{proposition}
+
+\paragraph{Conservative Gaussian calibration.}
+
+The distance-bound theorem of Appendix H applies directly to the nested
+closed convex cones $C_-\subseteq C$. Consequently,
+for every $\mu\in C_-$,
+\begin{equation}
+0
+\leq
+T_{+,\mu}
+\leq
+d^2(G,C_-)
+\qquad\text{almost surely}.
+\label{eq:directional-distance-bound}
+\end{equation}
+In particular,
+\begin{equation}
+\sup_{\mu\in C_-}
+\Pr(T_{+,\mu}>t)
+\leq
+\Pr
+\left\{
+d^2(G,C_-)>t
+\right\}.
+\label{eq:directional-tail-bound}
+\end{equation}
+
+By Moreau decomposition,
+\begin{equation*}
+d^2(G,C_-)
+=
+\left\|
+\Pi_{C_-^\circ}(G)
+\right\|^2.
+\end{equation*}
+Thus its distribution is the chi-bar-square mixture
+\begin{equation}
+d^2(G,C_-)
+\sim
+\sum_{j=0}^{3}
+v_j(C_-^\circ)\chi_j^2,
+\label{eq:directional-distance-mixture}
+\end{equation}
+where the sum denotes a distributional mixture and
+$v_j(C_-^\circ)$ are the conic intrinsic volumes of the
+polar cone.
+
+Let $c_{\alpha,-}$ denote an upper-tail critical value
+satisfying
+\begin{equation*}
+\Pr
+\left\{
+d^2(G,C_-)>c_{\alpha,-}
+\right\}
+\leq
+\alpha.
+\end{equation*}
+Then
+\begin{equation}
+\sup_{\mu\in C_-}
+\Pr
+\left(
+T_{+,\mu}>c_{\alpha,-}
+\right)
+\leq
+\alpha.
+\label{eq:directional-gaussian-calibration}
+\end{equation}
+
+This bound is uniform over the indicated Gaussian
+local-null shifts. It does not, without additional
+assumptions, establish uniform size control for the
+original GLMM over all covariance ranks.
+
+\paragraph{Nonzero rank-one equality points.}
+
+Suppose $\Gamma_0$ has rank one with a positive
+eigenvalue, $D(\theta_0)=0$, and the full-parameter
+contrast gradient
+\begin{equation*}
+a
+=
+\nabla_\theta D(\theta_0)
+\end{equation*}
+is nonzero.
+
+Let $n$ be the supporting normal to the active PSD
+boundary, oriented so that the alternative tangent is
+\begin{equation*}
+T_1
+=
+\left\{
+h:
+n^\top h\geq 0
+\right\}.
+\end{equation*}
+Assume that the exact directional-null tangent is
+\begin{equation*}
+T_-
+=
+\left\{
+h:
+n^\top h\geq 0,
+\quad
+a^\top h\leq 0
+\right\}.
+\end{equation*}
+
+Retain the signed information-metric correlation
+\begin{equation}
+c
+=
+\frac{
+a^\top I_0^{-1}n
+}{
+\sqrt{
+(a^\top I_0^{-1}a)
+(n^\top I_0^{-1}n)
+}
+},
+\label{eq:directional-normal-correlation}
+\end{equation}
+and suppose $|c|<1$. In the coordinates below, the
+inward PSD normal points along the positive $v$ axis, so the
+unit contrast normal has components $(\sqrt{1-c^2},c)$.
+
+\begin{proposition}[Directional rank-one limit]
+\label{prop:directional-rankone-limit}
+
+Under the preceding conditions and the joint
+constrained likelihood regularity assumptions of
+Section 4, the directional LRT has the limiting
+distribution
+\begin{equation}
+\mathrm{LRT}_{+,n}
+\xrightarrow{d}
+T_{+,c}
+=
+\left\|
+\Pi_{\mathcal H}(Z)
+\right\|^2
+-
+\left\|
+\Pi_{\mathcal Q_c}(Z)
+\right\|^2,
+\label{eq:directional-rankone-limit}
+\end{equation}
+where
+\begin{equation*}
+Z\sim N_2(0,I_2),
+\end{equation*}
+and
+\begin{align*}
+\mathcal H
+&=
+\left\{
+(u,v):
+v\geq 0
+\right\},
+\\
+\mathcal Q_c
+&=
+\left\{
+(u,v):
+v\geq 0,
+\quad
+\sqrt{1-c^2}\,u+cv\leq 0
+\right\}.
+\end{align*}
+
+For
+\begin{equation*}
+u_\varphi
+=
+(\cos\varphi,\sin\varphi)^\top,
+\end{equation*}
+define
+\begin{equation*}
+h_c(\varphi)
+=
+\left\|
+\Pi_{\mathcal H}(u_\varphi)
+\right\|^2
+-
+\left\|
+\Pi_{\mathcal Q_c}(u_\varphi)
+\right\|^2.
+\end{equation*}
+
+Then, for $t>0$,
+\begin{equation}
+\Pr(T_{+,c}>t)
+=
+\frac{1}{2\pi}
+\int_{\{h_c(\varphi)>0\}}
+\exp
+\left\{
+-\frac{t}{2h_c(\varphi)}
+\right\}
+\,d\varphi.
+\label{eq:directional-angular-tail}
+\end{equation}
+
+\end{proposition}
+
+In a general model, the cases $|c|=1$ require separate analysis.
+For the four strictly increasing variance links here, the equality
+covariance gradient is an indefinite matrix whereas the rank-one
+PSD boundary normal is semidefinite. Thus these two normals are
+linearly independent and $|c|<1$ at every regular nonzero rank-one
+equality point. This is established in the completed geometric proof
+and applies to the directional boundary as well.
+
+\paragraph{Regular and strictly null configurations.}
+
+At a fixed positive-definite equality point with
+$\nabla_\theta D(\theta_0)\neq 0$, standard one-sided
+likelihood theory yields
+\begin{equation}
+\mathrm{LRT}_{+,n}
+\xrightarrow{d}
+\frac{1}{2}\chi_0^2
++
+\frac{1}{2}\chi_1^2.
+\label{eq:directional-interior-limit}
+\end{equation}
+
+At a fixed parameter satisfying $D(\theta_0)<0$,
+the directional inequality is inactive locally.
+Under consistency of the unrestricted and restricted
+estimators and the usual likelihood regularity
+conditions,
+\begin{equation}
+\mathrm{LRT}_{+,n}
+\xrightarrow{p}
+0.
+\label{eq:directional-strict-null-limit}
+\end{equation}
+
+The vertex Gaussian calibration, fixed rank-one angular law,
+and regular interior limit characterize distinct regimes.
+The following exact-coordinate construction and uniform transfer
+result combine them into a conservatively calibrated test over
+the specified compact informative-design classes, including
+covariance-rank transitions.
+
+
+\subsection{Exact PSD-preserving contrast coordinates}
+\label{subsec:sec7-exact-chart}
+
+The preceding linear canonical chart describes the vertex geometry,
+but the VPC equality constraint is generally nonlinear away from the
+vertex. An exact local change of covariance coordinates is possible
+because the four variance-link functions are strictly increasing.
+Let $z_j=(1,x_j)^{\mathsf T}$, $j=0,1$, with $x_0\ne x_1$,
+put $B=[z_0\ z_1]$, and write
+\begin{equation}\label{eq:sec7-twolevel-cov}
+ B^{\mathsf T}\Gamma B=\begin{pmatrix}v_0&c\\c&v_1\end{pmatrix}=:M.
+\end{equation}
+The map $\Gamma\mapsto M$ is invertible and preserves PSD.
+Retain $R_j(v,\xi)=\rho(x_j;\xi,\Gamma)$ at $v=v_j$.
+On the relevant compact directional-null class and a neighborhood
+thereof, define the smooth inverse-link map
+\begin{equation}\label{eq:sec7-hlink}
+ h_\xi(v)=R_0(\cdot,\xi)^{-1}\{R_1(v,\xi)\},\qquad
+ s_\xi(v)=\begin{cases}
+ h_\xi(v)/v,&v>0,\\
+ h_\xi'(0),&v=0.
+ \end{cases}
+\end{equation}
+Here $h_\xi(0)=0$ and
+$h_\xi'(0)=R_{1,v}(0,\xi)/R_{0,v}(0,\xi)>0$.
+In particular $s_\xi$ has a smooth positive extension through zero.
+
+\begin{theorem}[Exact contrast chart]\label{thm:sec7-exact-chart}
+Suppose $R_j(0,\xi)=0$ and $R_j$ is $C^5$ and strictly
+increasing in variance, with derivative bounded above and away
+from zero on the relevant buffered compact class. These properties
+hold for the Gaussian identity-link and the Poisson, NB2, and CPG
+log-link VPCs under their admissible compact family restrictions.
+There is a nuisance-preserving, locally invertible $C^3$ change
+of coordinates near every compact equality or directional null
+class, given by
+\begin{equation}\label{eq:sec7-exact-psd-map}
+ \begin{aligned}
+ H_\xi(M)&=
+ \begin{pmatrix}
+ v_0 &c\sqrt{s_\xi(v_1)}\\
+ c\sqrt{s_\xi(v_1)}&h_\xi(v_1)
+ \end{pmatrix},\\
+ \widetilde\Gamma&=O^{\mathsf T}H_\xi(M)O,
+ \quad O=\frac1{\sqrt2}
+ \begin{pmatrix}1&1\\1&-1\end{pmatrix}.
+ \end{aligned}
+\end{equation}
+It preserves positive semidefiniteness and covariance rank and
+has a smooth local inverse. With
+$\nu=(\widetilde\gamma_{11},\widetilde\gamma_{12},
+\widetilde\gamma_{22})^{\mathsf T}$, the \emph{exact} hypotheses are
+\begin{equation}\label{eq:sec7-chart-null-cones}
+ \begin{aligned}
+ D=0&\iff\widetilde\gamma_{12}=0,\\
+ D\le0&\iff\widetilde\gamma_{12}\ge0.
+ \end{aligned}
+\end{equation}
+Consequently, locally on the buffered true null classes, the
+alternative, equality, and directional covariance factors are
+respectively the fixed closed convex cones
+\begin{equation}\label{eq:sec7-fixed-cones}
+ \begin{aligned}
+ K&=\{\nu:\widetilde\Gamma(\nu)\succeq0\},\\
+ W_E&=K\cap\{\nu:\nu_2=0\},\\
+ W_-&=K\cap\{\nu:\nu_2\ge0\}.
+ \end{aligned}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The strict monotonicity of $R_j$ ensures that $h_\xi$ exists
+on a common neighborhood of the compact null class: on the
+directional null,
+$R_1(v_1,\xi)\le R_0(v_0,\xi)$, so
+$0\le h_\xi(v_1)\le v_0$. The same inequality for every
+$0\le v\le v_1$ yields a compact downward domain on which
+the implicit-function theorem provides smooth inverse branches.
+The identity
+$s_\xi(v)=\int_0^1h_\xi'(tv)\,dt$ proves its positive smooth
+extension at zero. Writing
+$D_s=\operatorname{diag}(1,\sqrt{s_\xi(v_1)})$ gives
+$H_\xi(M)=D_s M D_s$; hence PSD and rank are preserved in
+both directions. The Jacobian of
+$(v_0,v_1,c)\mapsto(v_0,h_\xi(v_1),c\sqrt{s_\xi(v_1)})$
+has strictly positive determinant
+$h_\xi'(v_1)\sqrt{s_\xi(v_1)}$ and an explicit local inverse.
+Finally the off-diagonal element of $O^{\mathsf T}H_\xi(M)O$
+is $\{v_0-h_\xi(v_1)\}/2$. Because $R_0$ is increasing,
+$\operatorname{sign}D=\operatorname{sign}\{h_\xi(v_1)-v_0\}$,
+which proves \eqref{eq:sec7-chart-null-cones} and the
+fixed-cone representation.
+\end{proof}
+
+\paragraph{Correct information under the nonlinear chart.}
+The chart depends on nuisance parameters. If
+$\eta=(\xi^{\mathsf T},\nu^{\mathsf T})^{\mathsf T}$ and
+$F(\eta)=(\xi^{\mathsf T},\gamma(\xi,\nu)^{\mathsf T})^{\mathsf T}$
+is its inverse, set $L(\eta)=D_\eta F(\eta)$ and transform the
+\emph{full} expected Fisher information before profiling:
+\begin{equation}\label{eq:sec7-transform-full-info}
+ \begin{aligned}
+ \mathcal I(\eta)&=L(\eta)^{\mathsf T}I\{F(\eta)\}L(\eta),\\
+ \mathcal J(\eta)&=\mathcal I_{\nu\nu}-
+ \mathcal I_{\nu\xi}\mathcal I_{\xi\xi}^{-1}
+ \mathcal I_{\xi\nu}.
+ \end{aligned}
+\end{equation}
+At nonzero covariance, $D_\xi\gamma(\xi,\nu)$ need not vanish.
+Therefore, congruence of the original covariance Schur complement
+alone is generally incorrect. At the vertex, that derivative is zero,
+and the ordinary covariance-only congruence is recovered.
+For consistency with the Gaussian wedge formulas above, let
+$P$ be the permutation satisfying
+$\nu=P(a,b,z)^{\mathsf T}=(a,z,b)^{\mathsf T}$ and put
+\begin{equation}\label{eq:sec7-chart-Q}
+ Q=P^{\mathsf T}\mathcal J P\succ0.
+\end{equation}
+This $Q$ is the information metric required by the exact
+nonlinear chart; it may have arbitrary off-diagonal coupling.
+
+\subsection{Compact-uniform conservative comparison tests}
+\label{subsec:sec7-uniform-contrast}
+
+The following result strengthens the fixed-stratum Gaussian
+statements to a single conservative uniform test on the verified
+four-family parameter classes. It does not assert unrestricted
+uniformity over unbounded parameters, uninformative designs, or
+singular Fisher information.
+
+\begin{theorem}[Uniform contrast calibration]
+\label{thm:sec7-uniform-contrasts}
+Suppose the finite-type informative designs, nuisance compactness,
+buffered covariance domain, and exact global marginal-likelihood
+conditions of Subsection~\ref{subsec:sec4-compact-uniform} hold.
+The nuisance dimension is fixed and finite, the full Fisher
+information is uniformly positive definite, and the family-specific
+likelihood regularity conditions are as verified for the Gaussian,
+Poisson, NB2, and CPG models; both CPG dispersion and power remain
+unknown. Let $\mathcal N_E\subset\Theta_E$ and
+$\mathcal N_-\subset\Theta_-$ be buffered compact true null
+classes, possibly containing every covariance rank. For
+$0<\alpha<1$, let $\widehat Q_n$ consistently estimate
+\eqref{eq:sec7-chart-Q} using the correctly transformed full
+information at a consistent unrestricted or corresponding null fit.
+Then the exact equality LRT obeys
+\begin{equation}\label{eq:sec7-equality-uniform}
+ \boxed{\displaystyle
+ \limsup_{n\to\infty}\sup_{\theta\in\mathcal N_E}
+ P_\theta\!\left\{\mathrm{LRT}_{E,n}>
+ c_\alpha(\widehat Q_n)\right\}\le\alpha,}
+\end{equation}
+where $c_\alpha$ is the positive conservative Gaussian
+critical value from Theorem~\ref{thm:eq_improved}.
+For the directional test, let $c_{\alpha,-}^{\rm dist}(Q)$ be
+the positive upper-$\alpha$ quantile of the wedge-distance law
+\eqref{eq:eq_old_bound}, with opening angle computed from the
+correct $Q$. Then
+\begin{equation}\label{eq:sec7-directional-uniform}
+ \boxed{\displaystyle
+ \limsup_{n\to\infty}\sup_{\theta\in\mathcal N_-}
+ P_\theta\!\left\{\mathrm{LRT}_{+,n}>
+ c_{\alpha,-}^{\rm dist}(\widehat Q_n)\right\}\le\alpha.}
+\end{equation}
+These statements allow arbitrary SPD information coupling,
+rank transitions, and sequences of order $n^{-1/2}$ or larger
+in covariance coordinates. They make no four-endpoint
+least-favorable assertion.
+\end{theorem}
+
+\begin{proof}
+In the exact chart, the local alternative and null covariance
+sets centered at a true transformed covariance $\nu_n$ are
+$K-\sqrt n\nu_n$ and $W_0-\sqrt n\nu_n$, with
+$W_0=W_E$ or $W_-$. They are nested closed convex sets
+containing zero, including along divergent local displacements.
+The verified compact likelihood regularity gives uniform
+root-$n$ localization of both constrained maxima, a
+true-parameter-centered quadratic likelihood expansion, a
+uniform Gaussian score approximation, and consistently estimated
+transformed information. Profiling nuisance in the quadratic
+experiment yields the corresponding Fisher-metric difference
+of squared distances. Nonexpansiveness of convex projection
+and positive-threshold anti-concentration of nested distance
+statistics transfer Gaussian rejection probabilities uniformly,
+without assuming a fixed covariance rank.
+
+For equality the mean displacement belongs to $W_E$, so the
+Gaussian envelope from Theorem~\ref{thm:eq_improved} bounds
+its survival probability for every displacement and SPD $Q$.
+For the directional null, the translated-cone argument gives
+\[T_{-,\mu}\le d^2(G,\mathcal J^{1/2}W_-)
+\le d^2(G,\mathcal J^{1/2}W_E),\]
+where $G\sim N_3(0,I_3)$ and the last squared distance has
+the wedge-distance law \eqref{eq:eq_old_bound}. Continuity of
+the positive critical values and consistency of $\widehat Q_n$
+finish both uniform size bounds. Full details of the moving-set
+anti-concentration and family-specific likelihood arguments
+are supplied in the completed proof supplement, Sections 2--4
+and 9.
+\end{proof}
+
+\begin{corollary}[Information-free comparison rule]
+\label{cor:sec7-information-free}
+Under the same compact-uniform assumptions, both the equality
+and directional LRTs are asymptotically level $\alpha$ uniformly
+when calibrated by the fixed upper-$\alpha$ quantile of the
+distributional mixture
+\begin{equation}\label{eq:sec7-universal-mixture}
+ \boxed{\frac12\chi_2^2+\frac12\chi_3^2.}
+\end{equation}
+No estimation of the chart information is required for the
+critical value, although positive-definite information and the
+exact global likelihood assumptions remain necessary.
+\end{corollary}
+\begin{proof}
+For any SPD $Q$, the wedge-distance survival in
+\eqref{eq:eq_old_bound} is bounded by
+$\tfrac12\overline F_{\chi_2^2}(t)+
+\tfrac12\overline F_{\chi_3^2}(t)$ because
+$\overline F_{\chi_1^2}(t)\le
+\overline F_{\chi_3^2}(t)$. For equality, the pathwise
+nested-cone distance bound and the same wedge dominate its
+Gaussian statistic. The preceding theorem transfers both
+bounds uniformly to the likelihood ratios.
+\end{proof}
+
+\paragraph{Scope and numerical approximation.}
+The fixed-stratum angular laws may be used where their
+specific tangent-model assumptions hold; the uniform
+conservative cutoffs above require no covariance-rank
+selection. The sharper equality envelope uses the
+\emph{exact-chart} information, not a sample Hessian evaluated
+at an incorrectly imposed vertex. All three calibrations
+concern ideal marginal likelihood suprema and exact nonlinear
+null constraints. A numerical implementation inherits them
+only if the full and null maximized log likelihoods, information
+when used, and numerical critical values have the appropriate
+uniform negligible errors. Those software requirements have
+not been established by the theoretical proof.
