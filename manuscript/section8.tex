@@ -1,0 +1,651 @@
+% Section 8. Requires amsmath, amssymb, amsthm, amsfonts.
+% Uses the notation, theorem environments, and bibliography of Sections 2--6.
+\section{Confidence Intervals for the VPC}
+\label{sec:vpc_confidence}
+
+Fix a covariate value $x$ and write $r_x(\theta)=\rho(x;\theta)$.
+As in Section~\ref{sec:geometry_asymptotics}, let
+\[
+\theta=(\lambda^{\mathsf T},\gamma^{\mathsf T})^{\mathsf T}
+\in\Theta=\Lambda\times K,\qquad
+\gamma=(\gamma_{11},\gamma_{12},\gamma_{22})^{\mathsf T},
+\]
+where $\lambda$ collects all fixed-effect and family-specific parameters,
+$K=\{\gamma:\Gamma(\gamma)\succeq0\}$, and
+$d_\theta=p_\lambda+3$ is the dimension of the full parameter vector.
+Let $n$ denote the number of independent clusters, and let $I_0\succ0$
+be the limiting full Fisher information at the true parameter $\theta_0$.
+The covariance matrix may be positive definite, nonzero rank one, or zero.
+
+The local likelihood and constrained-estimation framework of
+Section~\ref{sec:geometry_asymptotics} is maintained throughout.
+In particular, its assumptions are high-level conditions on the marginal
+likelihood, not restrictions to a particular conditional response family.
+We distinguish fixed-parameter limits from assertions uniform over
+sequences approaching changes in covariance rank, as in
+Section~\ref{sec:pointwise_inference}.
+
+For the strengthened compact-uniform statements below, let
+$\mathcal K\subset\Theta$ be a compact true-parameter class buffered
+from artificial nuisance and upper-covariance fitting boundaries,
+while allowing all covariance ranks. The exact marginal likelihood
+is globally maximized on a fixed enlarged compact fitted domain.
+The four-family sufficient conditions require independent clusters,
+a fixed finite collection of bounded informative designs with stable
+positive frequencies, fixed finite nuisance dimension, and uniformly
+positive-definite aggregate information. Gaussian residual variance,
+NB2 size, and CPG dispersion remain bounded above and away from zero;
+CPG power remains in a compact subinterval of $(1,2)$.
+These conditions are verified in the completed likelihood supplement.
+In particular, both CPG dispersion and power remain unknown.
+The general fixed-parameter propositions below remain valid under
+their individually stated assumptions, without asserting that these
+stronger sufficient conditions are necessary.
+
+\subsection{Interior VPC inference}
+\label{subsec:ci-interior}
+
+If $\Gamma_0\succ0$, $\lambda_0$ is interior, and $r_x$ admits a
+continuously differentiable local extension, Theorem~\ref{thm:sec4-full-mle}
+and the ordinary delta method yield
+\begin{equation}\label{eq:sec8-interior}
+\sqrt n\{r_x(\widehat\theta_n)-r_x(\theta_0)\}
+\xrightarrow{d}N(0,\sigma_x^2),
+\end{equation}
+where
+\begin{equation}\label{eq:sec8-interior-var}
+\sigma_x^2=\nabla r_x(\theta_0)^{\mathsf T}
+I_0^{-1}\nabla r_x(\theta_0).
+\end{equation}
+For $\sigma_x^2>0$, consistent estimation of the gradient and full
+information gives the usual Wald interval, intersected with $[0,1]$.
+The interior normal approximation is not automatically valid when
+$\Gamma_0$ is singular.
+
+\subsection{Functional inference under constrained estimation}
+\label{subsec:ci-boundary}
+
+Let $T_0=T_\Theta(\theta_0)$. Under the conditions of
+Theorem~\ref{thm:sec4-full-mle},
+\begin{equation}\label{eq:sec8-mle-limit}
+\begin{aligned}
+\sqrt n(\widehat\theta_n-\theta_0)&\xrightarrow{d}H_0,\\
+H_0&=\Pi_{T_0}^{I_0}(I_0^{-1}Z),
+\qquad Z\sim N_{d_\theta}(0,I_0).
+\end{aligned}
+\end{equation}
+If $r_x$ is Hadamard directionally differentiable tangentially to $T_0$
+under the conditions of Subsection~\ref{subsec:functional_asymptotics},
+then
+\begin{equation}\label{eq:sec8-directional}
+\sqrt n\{r_x(\widehat\theta_n)-r_x(\theta_0)\}
+\xrightarrow{d}V_x:=r'_{x,\theta_0}(H_0).
+\end{equation}
+For an ambient differentiable functional,
+$r'_{x,\theta_0}(h)=\nabla r_x(\theta_0)^{\mathsf T}h$.
+The limit can be non-Gaussian because the projection in
+\eqref{eq:sec8-mle-limit} is generally nonlinear.
+The projection acts on the full parameter vector. Its covariance component
+may equivalently be obtained using the efficient information $J_0$ of
+\eqref{eq:sec4-efficient-information}, followed by the nuisance adjustment
+in \eqref{eq:sec4-nuisance-projection}. Thus the use of $I_0$ here and
+$J_0$ in Sections~\ref{sec:global_lrt} and
+\ref{sec:pointwise_inference} is consistent.
+
+\subsection{Zero VPC at a nonzero rank-one covariance}
+\label{subsec:ci-zero-rankone}
+
+Set $z_x=(1,x)^{\mathsf T}$,
+$d_x=(1,2x,x^2)^{\mathsf T}$, and
+$v_x(\Gamma)=z_x^{\mathsf T}\Gamma z_x=d_x^{\mathsf T}\gamma$.
+Suppose $\Gamma_0$ is nonzero rank one and $r_x(\theta_0)=0$.
+Assume the observation-level variance is positive and, locally,
+\begin{equation*}
+\begin{aligned}
+r_x(\theta)&=R_x(v_x(\Gamma),\lambda),\\
+R_x(0,\lambda)&=0,\qquad
+c_x=\partial_vR_x(0,\lambda_0)>0.
+\end{aligned}
+\end{equation*}
+Put $g_x=(0_{p_\lambda}^{\mathsf T},d_x^{\mathsf T})^{\mathsf T}$.
+
+\begin{proposition}[Positive-part Gaussian limit]
+\label{prop:sec8-positive-part}
+Under the preceding assumptions and Theorem~\ref{thm:sec4-full-mle},
+\begin{equation}\label{eq:sec8-positive-part}
+\sqrt n\,r_x(\widehat\theta_n)
+\xrightarrow{d}s_x(N)_+,
+\qquad N\sim N(0,1),
+\end{equation}
+where
+\begin{equation}\label{eq:sec8-positive-scale}
+s_x=c_x\sqrt{g_x^{\mathsf T}I_0^{-1}g_x}>0.
+\end{equation}
+The limiting distribution has an atom of probability $1/2$ at zero.
+\end{proposition}
+
+The proof is supplied in Section~7.1 of the completed confidence-set supplement. The full
+inverse information incorporates nuisance-parameter correlations.
+
+
+This reduction is specific to a zero-VPC functional at a rank-one
+covariance. It is not a general assertion that smooth functionals at
+rank-one points have positive-part Gaussian limits.
+
+\subsection{Zero VPC at the covariance vertex}
+\label{subsec:ci-zero-vertex}
+
+At $\Gamma_0=0$, the tangent cone is
+$T_0=\mathbb R^{p_\lambda}\times K$.
+Under the same local representation and differentiability assumptions,
+\begin{equation}\label{eq:sec8-vertex}
+\sqrt n\,r_x(\widehat\theta_n)
+\xrightarrow{d}
+c_xg_x^{\mathsf T}
+\Pi_{\mathbb R^{p_\lambda}\times K}^{I_0}(I_0^{-1}Z).
+\end{equation}
+The limiting variable is nonnegative but generally does not have the
+positive-part Gaussian law in \eqref{eq:sec8-positive-part}.
+Its distribution can be evaluated through Gaussian simulation and
+Fisher-metric projection onto the PSD cone. In particular, the omnibus
+chi-bar-square weights of Section~\ref{sec:global_lrt} do not directly
+calibrate this scalar functional.
+
+\subsection{Rank-adaptive projection inference}
+\label{subsec:ci-rank-adaptive}
+
+Consistency of $\widehat\Gamma_n$ does not imply convergence of its
+unregularized tangent cone. At a vertex truth, for example, an estimated
+positive-definite covariance has tangent cone $\mathbb R^3$, whereas
+the true tangent cone is $K$. To estimate the fixed-parameter projection
+law, let $\widehat a_1\ge\widehat a_2\ge0$ be the eigenvalues of
+$\widehat\Gamma_n$, and choose a deterministic sequence $\tau_n$ with
+\begin{equation}\label{eq:sec8-threshold}
+\tau_n\downarrow0,\qquad\sqrt n\tau_n\longrightarrow\infty.
+\end{equation}
+Define $\widehat q_n=\sum_{j=1}^2\mathbf1\{\widehat a_j>\tau_n\}$.
+Set $\widehat T_{K,n}=K$ when $\widehat q_n=0$,
+$\widehat T_{K,n}=\mathbb R^3$ when $\widehat q_n=2$,
+and otherwise use the supporting half-space determined by the
+estimated kernel eigenvector. Put
+$\widehat T_n=\mathbb R^{p_\lambda}\times\widehat T_{K,n}$.
+
+\begin{proposition}[Fixed-parameter rank recovery]
+\label{prop:sec8-rank-recovery}
+If $\Gamma_0$ is fixed and
+$\|\widehat\Gamma_n-\Gamma_0\|_{\mathrm{op}}=O_p(n^{-1/2})$,
+then under \eqref{eq:sec8-threshold},
+\begin{equation}\label{eq:sec8-rank-recovery}
+\Pr\{\widehat q_n=\operatorname{rank}(\Gamma_0)\}\longrightarrow1.
+\end{equation}
+Moreover, the projections onto $\widehat T_{K,n}$ converge in
+probability, uniformly for arguments in compact sets, to the
+projections onto $T_K(\gamma_0)$ in any fixed positive-definite metric.
+\end{proposition}
+
+The proof is supplied in Section~7.2 of the completed confidence-set supplement.
+
+
+Let $\widehat I_n\xrightarrow{p}I_0$ be positive definite.
+Conditionally on the observations, draw
+$Z^{(b)}\sim N_p(0,\widehat I_n)$ and compute
+\begin{align}
+H^{(b)}&=\Pi_{\widehat T_n}^{\widehat I_n}
+(\widehat I_n^{-1}Z^{(b)}),\label{eq:sec8-sim-H}\\
+V_x^{(b)}&=r'_{x,\widehat\theta_n}(H^{(b)}).
+\label{eq:sec8-sim-V}
+\end{align}
+Under consistent derivative estimation, rank recovery, and accurate
+projection computation, this estimates the fixed-parameter limiting law
+in \eqref{eq:sec8-directional}. When the relevant limiting quantiles are uniquely identified, the
+limiting distribution is continuous and strictly increasing at them,
+and the estimated quantiles are consistent, an equal-tail interval is
+\begin{equation}\label{eq:sec8-equal-tail}
+\left[
+\widehat r_x-\frac{\widehat q_{1-\alpha/2}}{\sqrt n},
+\widehat r_x-\frac{\widehat q_{\alpha/2}}{\sqrt n}
+\right]\cap[0,1],\qquad
+\widehat r_x=r_x(\widehat\theta_n).
+\end{equation}
+Here $\widehat q_a$ denotes the estimated $a$-quantile of the
+simulated limit, not the rank estimator $\widehat q_n$.
+At atoms, including the atom in \eqref{eq:sec8-positive-part},
+quantile continuity and exact equal-tail coverage cannot be presumed.
+Acceptance regions must then specify boundary-mass conventions and
+have separately verified coverage. For a discontinuous limit, one may
+instead use estimated cutoffs
+$a_n\le b_n$ for the centered estimation error, but coverage requires
+control of the acceptance events, not merely weak convergence of the
+simulated distribution. A sufficient condition is that the cutoffs
+converge in probability to finite $a<b$ with
+$\Pr(V_x=a)=\Pr(V_x=b)=0$ and
+$\Pr(a\le V_x\le b)\ge1-\alpha$; then the inverted interval
+$[\widehat r_x-b_n/\sqrt n,\widehat r_x-a_n/\sqrt n]
+\cap[0,1]$ has limiting coverage at least $1-\alpha$.
+If an endpoint lies at an atom, the inclusion probability must be
+proved separately. Section~7.3 of the completed confidence-set supplement gives the precise
+argument and illustrates the zero-VPC rank-one case.
+The rank-recovery statement is pointwise: eigenvalues of order
+$n^{-1/2}$ are not uniformly separable from zero.
+
+\subsection{Rank-free confidence regions and score inversion}
+\label{subsec:ci-rankfree}
+
+Rank-adaptive simulation approximates the distribution of a
+constrained estimator. A different strategy is to construct a
+confidence region for the full parameter and project that region
+through $r_x$. Both constructions below avoid covariance-rank
+classification, although they rely on different regularity conditions.
+
+\paragraph{A Fisher-metric ellipsoid centered at the constrained MLE.}
+Let $\widehat I_n\xrightarrow{p}I_0\succ0$ and define
+\begin{equation}\label{eq:sec8-ellipsoid}
+\mathcal E_{n,1-\alpha}
+=\left\{\theta\in\Theta:
+ n(\theta-\widehat\theta_n)^{\mathsf T}
+ \widehat I_n(\theta-\widehat\theta_n)
+ \le\chi^2_{d_\theta,1-\alpha}\right\}.
+\end{equation}
+Its projected VPC set is $r_x(\mathcal E_{n,1-\alpha})$;
+when extrema exist, the interval hull is
+\begin{equation}\label{eq:sec8-ellipsoid-interval}
+\mathcal I_{n,1-\alpha}^{\mathrm{ell}}(x)
+=\left[
+\inf_{\theta\in\mathcal E_{n,1-\alpha}}r_x(\theta),
+\sup_{\theta\in\mathcal E_{n,1-\alpha}}r_x(\theta)
+\right].
+\end{equation}
+
+\begin{proposition}[Fixed-parameter ellipsoid coverage]
+\label{prop:sec8-ellipsoid-coverage}
+Suppose the conditions of Theorem~\ref{thm:sec4-full-mle}
+hold at a fixed $\theta_0$, and
+$\widehat I_n\xrightarrow{p}I_0\succ0$. Then
+\begin{equation}\label{eq:sec8-ellipsoid-coverage}
+\liminf_{n\to\infty}
+\Pr_{\theta_0}\{\theta_0\in\mathcal E_{n,1-\alpha}\}
+\ge1-\alpha.
+\end{equation}
+Consequently, the projected set and its interval hull have
+asymptotic coverage at least $1-\alpha$ for $r_x(\theta_0)$.
+\end{proposition}
+
+The proof is supplied in Section~7.4 of the completed confidence-set supplement.
+
+
+The ellipsoid can be conservative because it uses the full-dimensional
+$\chi_{d_\theta}^2$ cutoff. It is centered at the constrained MLE,
+not at an unconstrained estimate that might violate the PSD constraint.
+
+\begin{theorem}[Uniform rank-free ellipsoid coverage]
+\label{thm:sec8-ellipsoid-uniform}
+Suppose the uniform exact-likelihood conditions stated at the beginning
+of this section hold on $\mathcal K$, and
+$\widehat I_n-I(\theta)=o_{P_\theta}(1)$ uniformly over
+$\theta\in\mathcal K$. Then
+\begin{equation}\label{eq:sec8-ellipsoid-uniform}
+\liminf_{n\to\infty}\inf_{\theta\in\mathcal K}
+P_\theta\{\theta\in\mathcal E_{n,1-\alpha}\}\ge 1-\alpha.
+\end{equation}
+Its projected confidence sets and interval hulls have the same
+uniform coverage lower bound, for every fixed $x$, including
+sequences crossing covariance-rank boundaries.
+\end{theorem}
+
+The proof uses the \emph{true-centered} translated feasible set
+$\mathbb R^{p_\lambda}\times\{\sqrt n(K-\gamma)\}$.
+Its Gaussian quadratic maximizer is the metric projection of the
+full score onto this closed convex set containing zero, and its
+squared norm is bounded by the unrestricted full-score norm.
+Uniform likelihood expansion, estimator localization, and the
+$\chi^2_{d_\theta}$ score limit establish the result.
+The full argument is given in Section~7.5 of the completed proof
+supplement. No uniform covariance-rank estimator is used.
+
+\paragraph{Full-parameter score inversion.}
+The LAN assumption of Section~\ref{subsec:lan} is formulated only
+for feasible local perturbations and does not itself assert existence
+of a full ambient likelihood gradient at singular covariance matrices.
+For the present construction, assume additionally that a suitable
+ambient differentiable extension exists at candidate parameters.
+Define
+\begin{equation}\label{eq:sec8-score-stat}
+\begin{aligned}
+\Delta_n(\theta)&=n^{-1/2}\nabla_\theta\ell_n(\theta),\\
+S_n(\theta)&=\Delta_n(\theta)^{\mathsf T}
+\widehat I_n(\theta)^{-1}\Delta_n(\theta),
+\end{aligned}
+\end{equation}
+where $\widehat I_n(\theta)$ estimates the \emph{full}
+candidate-parameter information. For the verified score theorem below,
+one may use the outer-product-of-scores estimator
+\begin{equation}\label{eq:sec8-opg}
+\widehat I_n^{\mathrm{OPG}}(\theta)
+=\frac1n\sum_{i=1}^n s_i(\theta)s_i(\theta)^{\mathsf T},
+\qquad s_i(\theta)=\nabla_\theta\ell_i(\theta).
+\end{equation}
+If the candidate information matrix is not positive definite,
+set $S_n(\theta)=0$ as a conservative candidate-wise fallback;
+this event has uniformly vanishing probability at a true parameter
+on the verified informative classes.
+For $u\in r_x(\Theta)$, put
+\begin{equation}\label{eq:sec8-profile-score}
+\begin{aligned}
+\Theta_x(u)&=\{\theta\in\Theta:r_x(\theta)=u\},\\
+S_{n,x}^{\mathrm{prof}}(u)&=
+\inf_{\theta\in\Theta_x(u)}S_n(\theta).
+\end{aligned}
+\end{equation}
+To avoid any ambiguity when the infimum is not attained, define
+\begin{equation}\label{eq:sec8-score-acceptance}
+\mathcal A_{n,1-\alpha}^{\mathrm{score}}
+=\{\theta\in\Theta:S_n(\theta)\le\chi^2_{d_\theta,1-\alpha}\}
+\end{equation}
+and the exact projected confidence set
+\begin{equation}\label{eq:sec8-score-ci}
+\mathcal C_{n,1-\alpha}^{\mathrm{score}}(x)
+=r_x(\mathcal A_{n,1-\alpha}^{\mathrm{score}}).
+\end{equation}
+If each relevant infimum is attained, this equals
+$\{u:S_{n,x}^{\mathrm{prof}}(u)\le\chi^2_{d_\theta,1-\alpha}\}$.
+Without attainment, the latter set may include additional boundary
+values; the distinction does not affect the coverage lower bound below.
+
+\begin{proposition}[Fixed-parameter score coverage]
+\label{prop:sec8-rankfree}
+Fix $\theta_0\in\Theta$. Suppose the score is defined at $\theta_0$
+and
+\[
+\Delta_n(\theta_0)\xrightarrow{d}N_{d_\theta}(0,I_0),
+\qquad
+\widehat I_n(\theta_0)\xrightarrow{p}I_0\succ0.
+\]
+Then
+\begin{equation}\label{eq:sec8-score-pointwise-coverage}
+\liminf_{n\to\infty}\Pr_{\theta_0}
+\{r_x(\theta_0)\in
+\mathcal C_{n,1-\alpha}^{\mathrm{score}}(x)\}
+\ge1-\alpha.
+\end{equation}
+No covariance-rank estimator is required.
+\end{proposition}
+
+The proof follows by full-parameter score convergence and deterministic projection; see Section~8.1 of the completed proof supplement.
+
+
+\begin{proposition}[Conditional uniform score coverage]
+\label{prop:sec8-rankfree-uniform}
+Let $\Theta^\star\subseteq\Theta$ and suppose
+\begin{equation}\label{eq:sec8-uniform-score-approx}
+\begin{aligned}
+\sup_{\theta\in\Theta^\star}\sup_{t\in\mathbb R}
+\big|\Pr_\theta\{S_n(\theta)\le t\}\\
+-F_{\chi_{d_\theta}^2}(t)\big|\longrightarrow0.
+\end{aligned}
+\end{equation}
+Then
+\begin{equation}\label{eq:sec8-uniform-score-coverage}
+\liminf_{n\to\infty}\inf_{\theta\in\Theta^\star}
+\Pr_\theta\{r_x(\theta)\in
+\mathcal C_{n,1-\alpha}^{\mathrm{score}}(x)\}
+\ge1-\alpha.
+\end{equation}
+\end{proposition}
+
+The proof follows by the uniform approximation and set inclusion; see Section~8.1 of the completed proof supplement.
+
+\begin{theorem}[Uniform score confidence region]
+\label{thm:sec8-score-verified}
+On $\mathcal K$ suppose the marginal cluster scores are centered,
+possess uniformly bounded $(2+\delta)$ moments for some $\delta>0$,
+and the aggregate information
+$I_n(\theta)=n^{-1}\sum_i\operatorname{Var}_\theta\{s_i(\theta)\}$
+has eigenvalues uniformly bounded above and away from zero.
+Use \eqref{eq:sec8-opg} in \eqref{eq:sec8-score-stat}, with the
+candidate-wise fallback above. Then
+\begin{equation}\label{eq:sec8-score-verified}
+\begin{aligned}
+\sup_{\theta\in\mathcal K}\big|
+P_\theta\{\theta\in\mathcal A_{n,1-\alpha}^{\mathrm{score}}\}\\
+-(1-\alpha)\big|\longrightarrow0.
+\end{aligned}
+\end{equation}
+Consequently, the exact projected score set and interval hull
+cover $r_x(\theta)$ with probability at least $1-\alpha$
+compact-uniformly. This conclusion applies to the four
+specified GLMM families on their verified compact informative-design
+classes, without covariance-rank classification.
+\end{theorem}
+
+The proof is a uniformly studentized triangular-array score CLT.
+The candidate-parameter OPG estimator is consistent at the true
+candidate by an entrywise law of large numbers using
+$(2+\delta)$ score moments; no Ekvall--Bottai
+individual-cluster information-comparison assumption is needed.
+See Section~8.1 of the completed proof supplement and Appendix~L.
+The score region may be inverted for a contrast as well as for a VPC.
+In particular, projecting one full-parameter confidence region
+simultaneously protects every well-defined VPC or difference
+functional under the same coverage event.
+
+
+When $\mathcal A_{n,1-\alpha}^{\mathrm{score}}$ is nonempty,
+its VPC interval hull is
+\begin{equation}\label{eq:sec8-score-interval}
+\mathcal I_{n,1-\alpha}^{\mathrm{score}}(x)
+=\left[
+\inf_{\theta\in\mathcal A_{n,1-\alpha}^{\mathrm{score}}}r_x(\theta),
+\sup_{\theta\in\mathcal A_{n,1-\alpha}^{\mathrm{score}}}r_x(\theta)
+\right].
+\end{equation}
+It contains the exact projected set and inherits its coverage lower
+bound. If the acceptance region is empty, no interval is produced by
+this definition; a conservative fallback such as $[0,1]$ must be
+specified if an interval is required for every sample. Both endpoints
+involve constrained global optimization; local numerical optima alone
+need not preserve the theoretical confidence region. A certified outer
+approximation to the acceptance region is conservative, whereas an
+inner approximation may under-cover.
+Neither the score set nor the ellipsoid is guaranteed to be the shorter
+of the two methods.
+
+
+\subsection{Likelihood-free CPG moment confidence regions}
+\label{subsec:ci-cpg-moments}
+
+A separate rank-free construction is available for the CPG family
+without evaluating its marginal likelihood, covariance score, or
+Fisher information. Consider independent informative clusters, each
+containing conditionally independent replicates $U_1,U_2,U_3$ at
+$x=0$ and $V_1,V_2$ at $x=1$, with common CPG dispersion $\phi>0$
+and unknown power $\kappa\in(1,2)$. Here the parameter is
+$\theta=(\beta_0,\beta_1,\phi,\kappa,
+\gamma_{11},\gamma_{12},\gamma_{22})$ of dimension seven.
+The repeated observations at a given level have the same conditional
+mean, family parameters, and random-effects design.
+Define the observable moment vector
+\begin{equation}\label{eq:sec8-cpg-moments}
+\begin{aligned}
+g(Y)=(&U_1,V_1,U_1U_2,V_1V_2,U_1V_1,\\
+     &U_1^2-U_1U_2,\\
+     &U_1^3-3U_1^2U_2+2U_1U_2U_3)^{\mathsf T},
+\end{aligned}
+\end{equation}
+and write $m(\theta)=E_\theta g(Y)$ and
+$\Omega(\theta)=\operatorname{Var}_\theta\{g(Y)\}$.
+The seven identifying moments admit an explicit smooth inverse at
+every covariance rank. In particular, using the notation of
+Appendix~L, the contrast moments $A$ and $B_3$ satisfy
+\begin{equation}\label{eq:sec8-cpg-inverse}
+\frac{m_0B_3}{A^2}
+=\kappa\exp\{(\kappa-1)^2v_0\},
+\end{equation}
+which is strictly increasing in $\kappa\in(1,2)$ for $v_0\ge0$.
+Thus both unknown CPG family parameters are identified.
+
+For $N$ independent clusters of this design, let
+$\bar g_N=N^{-1}\sum_i g(Y_i)$ and let $\widehat\Omega_N$
+be their empirical covariance matrix. When
+$\widehat\Omega_N\succ0$, put
+\begin{equation}\label{eq:sec8-cpg-stat}
+Q_N(\theta)=N\{\bar g_N-m(\theta)\}^{\mathsf T}
+\widehat\Omega_N^{-1}\{\bar g_N-m(\theta)\}
+\end{equation}
+and define
+\begin{equation}\label{eq:sec8-cpg-region}
+\mathcal A_{N,1-\alpha}^{\mathrm{mom}}
+=\{\theta\in\mathcal K:Q_N(\theta)
+\le\chi^2_{7,1-\alpha}\}.
+\end{equation}
+On the event $\widehat\Omega_N\not\succ0$, set this region equal
+to the entire admissible compact class $\mathcal K$.
+
+\begin{theorem}[Uniform CPG moment-region coverage]
+\label{thm:sec8-cpg-moment}
+For the preceding seven-parameter CPG experiment, assume the
+compact admissible parameter class and exogenous informative
+cluster design of Appendix~L. Then
+\begin{equation}\label{eq:sec8-cpg-uniform}
+\sup_{\theta\in\mathcal K}
+\left|P_\theta\{\theta\in
+\mathcal A_{N,1-\alpha}^{\mathrm{mom}}\}
+-(1-\alpha)\right|\longrightarrow0.
+\end{equation}
+The projection of this region through $r_x$ or through any
+fixed VPC contrast has uniform coverage at least $1-\alpha$.
+\end{theorem}
+
+The proof uses the smooth moment inverse, uniformly bounded
+polynomial response moments, uniformly positive-definite
+$\Omega(\theta)$, and a studentized multivariate central limit
+theorem. These premises are verified in Appendix~L and in
+Section~8.2 of the completed proof supplement.
+This result is specific to the stated seven-parameter experiment;
+it does not identify an arbitrary-dimensional nuisance vector from
+only seven statistics. The verified grouped-design extension stacks
+$D$ informative groups and uses $\chi^2_{7D,1-\alpha}$ with an
+explicit full-rank design condition. A moment region may be less
+efficient than a likelihood-based region, particularly because it
+uses third-order response moments.
+
+\subsection{Likelihood-ratio inversion and the pointwise test}
+\label{subsec:ci-lr-inversion}
+
+For $u\in r_x(\Theta)$, define the VPC-level likelihood ratio
+\begin{equation}\label{eq:sec8-profile}
+\mathrm{LR}_n(u)=2\left\{
+\ell_n(\widehat\theta_n)-
+\sup_{\theta\in\Theta_x(u)}\ell_n(\theta)
+\right\}.
+\end{equation}
+Given critical values $c_{n,\alpha}(u)$, its inversion is
+\begin{equation}\label{eq:sec8-inversion}
+\mathcal C_{n,1-\alpha}^{\mathrm{LR}}(x)
+=\{u\in r_x(\Theta):
+\mathrm{LR}_n(u)\le c_{n,\alpha}(u)\}.
+\end{equation}
+The coverage of this set depends on valid size control for the
+component tests, including nuisance parameters and boundary geometry.
+At $u=0$, the level set is precisely the pointwise null ray of
+Section~\ref{sec:pointwise_inference}, provided the zero-VPC
+property holds. Thus its vertex and nonzero rank-one regimes, and the
+local null sequences between them, are governed by the pointwise
+analysis of that section rather than a universal $\chi_1^2$ cutoff.
+The endpoint-envelope calibration developed there pertains to the
+zero-VPC level set; it does not by itself calibrate the likelihood
+ratio for arbitrary positive $u$. Nevertheless, a conservative
+uniform all-level calibration is available without resolving the
+geometry of every positive-level set.
+
+\begin{theorem}[Uniform conservative LR inversion]
+\label{thm:sec8-lr-universal}
+Assume the compact-uniform exact-likelihood conditions on
+$\mathcal K$ stated above: uniform root-$n$ localization of the full
+constrained maximizer, true-centered feasible quadratic expansion,
+uniform full-score Gaussian approximation, and uniformly
+positive-definite information. Then for every exact null set
+$A\subseteq\Theta$ containing the true $\theta$, the LRT
+$\Lambda_{n,A}$, formed from the unrestricted and
+null-restricted likelihood suprema, satisfies
+\begin{equation}\label{eq:sec8-lr-universal}
+\begin{aligned}
+\limsup_{n\to\infty}\sup_{\theta\in\mathcal K}
+\sup_{A\ni\theta}\ P_\theta\{\Lambda_{n,A}\\
+>\chi^2_{d_\theta,1-\alpha}\}\le\alpha,
+\end{aligned}
+\end{equation}
+where the inner supremum is over measurable exact-null
+likelihood-ratio statistics. In particular, using the constant
+cutoff $c_{n,\alpha}(u)=\chi^2_{d_\theta,1-\alpha}$ in
+\eqref{eq:sec8-inversion} yields
+\begin{equation}\label{eq:sec8-lr-uniform-coverage}
+\liminf_{n\to\infty}\inf_{\theta\in\mathcal K}
+P_\theta\{r_x(\theta)\in
+\mathcal C_{n,1-\alpha}^{\mathrm{LR}}(x)\}
+\ge1-\alpha.
+\end{equation}
+The same full-likelihood region provides conservative
+simultaneous coverage for collections of VPCs or contrasts.
+\end{theorem}
+
+Indeed, for every $A\ni\theta$,
+\begin{equation}\label{eq:sec8-lr-domination}
+\begin{aligned}
+0\le\Lambda_{n,A}
+&\le2\{\ell_n(\widehat\theta_n)-\ell_n(\theta)\}\\
+&\le\Delta_n(\theta)^{\mathsf T}
+I(\theta)^{-1}\Delta_n(\theta)+o_{P_\theta}(1)
+\end{aligned}
+\end{equation}
+uniformly on $\mathcal K$. The final quadratic form has the
+full-dimensional $\chi^2_{d_\theta}$ limit. The crucial
+bound is independent of the shape, convexity, or dimension
+of $A$. Section~7.6 of the completed proof supplement gives
+the complete uniform argument.
+
+The cutoff is generally conservative, but it is valid at both
+zero and positive VPC levels, across covariance-rank transitions.
+The specialized endpoint cutoff of Section~\ref{sec:pointwise_inference}
+can be substantially smaller at zero; it is not a valid default
+at positive VPC levels. Smaller positive-level cutoffs require
+additional level-set calibration and are not claimed here.
+
+\subsection{Validity, computation, and scope}
+\label{subsec:ci-scope}
+
+The methods above answer different inferential questions.
+The interior Wald interval is a regular fixed-parameter method;
+the constrained functional delta method and rank-adaptive simulation
+provide fixed-stratum limits, including non-Gaussian laws and atoms.
+Rank recovery is not uniform over covariance-rank transitions.
+The full-parameter ellipsoid, score-inversion region, and universal
+profile-LR region provide conservative \emph{compact-uniform} coverage
+under their respective verified likelihood and information premises.
+The explicit CPG seven-moment construction offers a separate
+likelihood-free uniform route on its informative compact model class.
+None requires covariance-rank classification for uniform validity.
+
+All projected VPC sets, difference sets, and simultaneous bands inherit
+full-parameter coverage by deterministic inclusion. An interval hull
+must contain the \emph{entire} image of the underlying confidence
+region. Theoretical statements concern the exact confidence regions
+and constrained global likelihood suprema. A local optimizer, fixed
+quadrature tolerance, numerical score, or inner approximation to the
+range is not enough to establish coverage. Certified outer bounds
+preserve coverage, and the full-likelihood construction provides a
+conservative alternative whenever a specialized critical value is
+unavailable.
+
+The compact-uniform four-family conclusions require the explicit
+bounded informative-cluster designs, fixed nuisance dimension,
+admissible buffered parameter compacts, uniform positive information,
+and globally correct likelihood fitting described above. Neither
+unbounded fitting domains, physical nuisance endpoints, singular
+Fisher information, nor growing clusters are covered by those
+verification theorems. The original mathematical results remain
+valid under their individually stated premises outside the verified
+classes, but further assumptions must then be established rather
+than inferred from the family name alone. The completed confidence-set
+proofs, including acceptance at atoms and both uniform projection
+constructions, are in Sections~7--8 of the completed proof supplement;
+Appendix~L contains the independent CPG moment-region derivation.
