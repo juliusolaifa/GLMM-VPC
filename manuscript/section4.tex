@@ -1,0 +1,337 @@
+\section{Constrained Parameter Geometry and Asymptotics}
+\label{sec:geometry_asymptotics}
+
+\subsection{Geometry of the covariance parameter space}
+\label{subsec:covariance_geometry}
+Let $\lambda\in\Lambda\subset\mathbb R^{p_\lambda}$ collect the nuisance parameters, and let $\gamma=(\gamma_{11},\gamma_{12},\gamma_{22})^{\mathsf T}$. For the random-intercept-and-slope model, write
+\begin{equation}\label{eq:sec4-psd-cone}
+\Gamma(\gamma)=
+\begin{pmatrix}
+\gamma_{11}&\gamma_{12}\\
+\gamma_{12}&\gamma_{22}
+\end{pmatrix}\succeq0.
+\end{equation}
+The covariance constraint and full parameter space are
+\begin{equation}\label{eq:sec4-parameter-space}
+\begin{aligned}
+K&=\{\gamma\in\mathbb R^3:\Gamma(\gamma)\succeq0\},\\
+\Theta&=\Lambda\times K.
+\end{aligned}
+\end{equation}
+We assume throughout that the true nuisance parameter $\lambda_0$ is interior to $\Lambda$. The covariance matrix $\Gamma_0$ may be positive definite, rank one, or zero. These cases have different feasible local perturbations and therefore different asymptotic behavior.
+
+\subsection{Lorentz-cone representation of the $2\times2$ PSD cone}
+\label{subsec:lorentz_representation}
+Define $t=L\gamma$ by
+\begin{equation}\label{eq:sec4-lorentz-map}
+\begin{aligned}
+t_0&=\tfrac12(\gamma_{11}+\gamma_{22}),\\
+t_1&=\tfrac12(\gamma_{11}-\gamma_{22}),\\
+t_2&=\gamma_{12}.
+\end{aligned}
+\end{equation}
+This is an invertible linear transformation, under which $\Gamma\succeq0$ is equivalent to
+\begin{equation}\label{eq:sec4-lorentz-cone}
+\begin{aligned}
+t\in\mathcal L_3
+=\bigl\{t\in\mathbb R^3:\;&t_0\geq0,\\
+&t_0^2\geq t_1^2+t_2^2\bigr\}.
+\end{aligned}
+\end{equation}
+Thus $LK=\mathcal L_3$, the three-dimensional Lorentz cone. Its vertex, boundary rays, and interior correspond to zero, rank-one, and positive-definite covariance matrices. This is a coordinate representation of the PSD constraint; it does not make the Fisher information Euclidean. The matrix $L$ and the corresponding geometric transformations are given in Appendix~C.
+
+
+\subsection{Tangent cones at interior, rank-one,
+and vertex points}
+\label{subsec:tangent_cones}
+
+For a closed set $C$ and $c\in C$, let
+$T_C(c)$ denote the Bouligand (contingent)
+tangent cone. Tangent cones describe the feasible first-order
+perturbations of a constrained parameter space.
+Their use in boundary likelihood asymptotics is
+standard; see \citet{self1987asymptotic} and
+\citet{shapiro1985}.
+The tangent cones of the PSD cone in this
+setting are closed and convex.
+
+
+\begin{proposition}\label{prop:sec4-tangent-cones}
+Let $\Gamma_0\succeq0$, with covariance coordinates $\gamma_0$. Then:
+\begin{enumerate}
+\item If $\Gamma_0\succ0$, then $T_K(\gamma_0)=\mathbb R^3$.
+\item If $\operatorname{rank}(\Gamma_0)=1$, let $u_0$ be a unit vector spanning $\ker(\Gamma_0)$. Then
+\begin{equation}\label{eq:sec4-rankone-tangent}
+\begin{aligned}
+T_K(\gamma_0)=\{h_\gamma:\;&u_0^{\mathsf T}
+H(h_\gamma)u_0\geq0\},
+\end{aligned}
+\end{equation}
+where
+\[
+H(h_\gamma)=
+\begin{pmatrix}
+h_{11}&h_{12}\\
+h_{12}&h_{22}
+\end{pmatrix}.
+\]
+\item If $\Gamma_0=0$, then $T_K(0)=K$.
+\end{enumerate}
+Moreover, because $\lambda_0$ is interior,
+\begin{equation}\label{eq:sec4-full-tangent}
+T_\Theta(\theta_0)
+=\mathbb R^{p_\lambda}\times T_K(\gamma_0).
+\end{equation}
+\end{proposition}
+At a rank-one covariance matrix, the tangent cone is a half-space, although the feasible covariance matrices form a curved cone. A tangent direction need not itself be PSD: it need only arise as the first-order limit of feasible perturbations around $\Gamma_0$. Appendix~C proves the characterization, including its Lorentz-coordinate form.
+
+\subsection{Local asymptotic normality and quadratic likelihood expansion}
+\label{subsec:lan}
+Let $\ell_n(\theta)$ denote the log-likelihood for the full parameter $\theta=(\lambda^{\mathsf T},\gamma^{\mathsf T})^{\mathsf T}$, and let $\theta_0\in\Theta$ be the true parameter. Let $I_0$ be the positive-definite limiting information matrix for the full parameter vector. Following the general boundary-likelihood framework of \citet{self1987asymptotic}, assume the following local asymptotic quadratic expansion holds uniformly over bounded feasible local perturbations $h$:
+\begin{equation}\label{eq:sec4-lan}
+\begin{aligned}
+&\ell_n(\theta_0+h/\sqrt n)-\ell_n(\theta_0)\\
+&\quad=h^{\mathsf T}Z_n
+-\tfrac12h^{\mathsf T}I_0h+o_p(1),
+\end{aligned}
+\end{equation}
+where $Z_n\xrightarrow{d}Z$ and $Z\sim N(0,I_0)$. The expansion is restricted to $\sqrt n(\Theta-\theta_0)$; it does not require likelihood evaluation at an indefinite covariance matrix.
+
+
+We further assume local identifiability, consistency,
+root-$n$ tightness, and sufficiently accurate likelihood
+maximization for the constrained estimators under
+consideration. The local feasible parameter sets are
+assumed to converge to their corresponding tangent
+cones in the sense required by the constrained argmax
+theorem.
+
+For likelihood-ratio inference, these conditions
+apply separately to the full-model and restricted-null
+maximum-likelihood estimators. In particular, both
+estimators must be localized at the root-$n$ scale,
+and their likelihood optimization errors must be
+$o_p(1)$ on the local log-likelihood scale.
+Together with the common uniform local quadratic
+expansion, these conditions ensure joint convergence
+of the maximized likelihood criteria.
+
+These are high-level assumptions on the likelihood
+and its maximizers, not claims of automatic
+regularity for any particular response model.
+The results below apply to likelihoods satisfying
+these conditions, independently of their specific
+conditional response distributions.
+Appendix~\ref{app:asymptotics} develops the
+corresponding constrained quadratic optimization
+and restricted-null limits.
+
+\subsection{Scope of compact-uniform inference}
+\label{subsec:sec4-compact-uniform}
+
+The preceding likelihood conditions are stated at a fixed true
+parameter. For the compact-uniform results developed in subsequent
+sections, we use a specified class of independent-cluster experiments
+and a common enlarged compact fitting domain. Let
+$\Lambda^+\subset\mathbb R^{p_\lambda}$ be a compact convex set
+contained in the admissible nuisance-parameter domain, and let
+$\Lambda_0\subset\operatorname{int}(\Lambda^+)$ be compact. For
+$0<M_0<M<\infty$, define
+\begin{equation}\label{eq:sec4-compact-classes}
+\begin{aligned}
+\Theta^+ & =\Lambda^+\times
+ \{\gamma\in K:\operatorname{tr}\Gamma(\gamma)\leq M\},\\
+\mathcal C & =\Lambda_0\times
+ \{\gamma\in K:\operatorname{tr}\Gamma(\gamma)\leq M_0\}.
+\end{aligned}
+\end{equation}
+The true parameter ranges over $\mathcal C$, whereas the unrestricted
+and null-constrained likelihoods are maximized over the corresponding
+subsets of $\Theta^+$. The gaps between these sets make the artificial
+nuisance and upper-covariance boundaries locally inactive. Crucially,
+$\mathcal C$ contains the covariance vertex, rank-one matrices, and
+positive-definite matrices; no positive lower bound is imposed on the
+eigenvalues of $\Gamma$.
+
+The verified four-family applications use a fixed finite collection of
+bounded cluster-design types with convergent frequencies, including
+positive-frequency identifying designs. Fixed-effect and family-specific
+nuisance dimensions are arbitrary but fixed. Gaussian residual variance
+and NB2 size are bounded away from zero and infinity. In the compound
+Poisson--Gamma family, both dispersion and power are unknown, with
+dispersion in a compact positive interval and power in a compact
+subinterval of $(1,2)$. The precise replicated-design and identifying
+conditions are stated in the family-specific proofs.
+
+Uniform conclusions over $\mathcal C$ additionally require
+true-parameter-centered quadratic likelihood expansions, uniform score
+normality and positive-definite information, and uniform localization of
+\emph{both} exact global likelihood maximizers over $\Theta^+$ and its
+relevant null subsets. These properties are verified on the specified
+informative compact classes using the family-specific analytic results
+and the general likelihood arguments of Appendix~\ref{app:general-regularity};
+they are not asserted for arbitrary designs or unbounded fitting
+domains. Replacing exact likelihood suprema by numerical fits requires
+separate control of the entire maximized log-likelihood error on the
+$o_p(1)$ scale. Thus fixed-parameter results below retain their original
+high-level assumptions, whereas claims of compact-uniform size or
+coverage use the stronger, explicitly delimited class above.
+
+\subsection{Constrained-MLE asymptotic distribution}
+\label{subsec:constrained_mle_limit}
+
+The Gaussian projection characterization of
+constrained likelihood estimators is a standard
+consequence of boundary likelihood theory
+\citep{self1987asymptotic,shapiro1985}.
+We state its specialization to the present
+PSD-constrained parameter space.
+For a closed convex cone $T$ and a
+positive-definite matrix $I$, define the
+Fisher-metric projection
+\begin{equation}
+\Pi_T^I(y)
+=
+\underset{h\in T}{\operatorname{argmin}}
+\,(h-y)^{\mathsf T}I(h-y).
+\label{eq:sec4-metric-projection}
+\end{equation}
+Write $T_0=T_\Theta(\theta_0)$.
+
+
+\begin{theorem}\label{thm:sec4-full-mle}
+Suppose the conditions in Subsection~\ref{subsec:lan} hold at $\theta_0=(\lambda_0^{\mathsf T},\gamma_0^{\mathsf T})^{\mathsf T}$, with $\lambda_0$ interior and $\Gamma_0\succeq0$. Let $\widehat\theta_n$ be a consistent constrained maximum likelihood estimator. Then
+\begin{equation}\label{eq:sec4-full-mle-limit}
+\begin{aligned}
+\sqrt n(\widehat\theta_n-\theta_0)
+&\xrightarrow{d}H_0,\\
+H_0&=\Pi_{T_0}^{I_0}(I_0^{-1}Z),
+\end{aligned}
+\end{equation}
+where $Z\sim N(0,I_0)$. The projection acts on the full parameter vector, not only its covariance coordinates.
+\end{theorem}
+If $\Gamma_0\succ0$, then $T_0$ is Euclidean space and $H_0\sim N(0,I_0^{-1})$. At rank-one and vertex covariance parameters, the projection is generally nonlinear, and the full-vector limit is generally non-Gaussian. The tangent cone in the theorem is evaluated at the \emph{true} parameter $\theta_0$, not at $\widehat\theta_n$.
+
+
+\begin{corollary}
+\label{cor:sec4-restricted-null}
+Suppose $\Gamma_0=0$ and the conditions of
+Subsection~\ref{subsec:lan} hold for both
+the full and restricted likelihood estimators.
+
+Let $\widetilde\lambda_n$ denote the
+maximum-likelihood estimator under
+$H_0:\Gamma=0$. Then
+\begin{equation}
+\label{eq:sec4-restricted-null-limit}
+\sqrt n(\widetilde\lambda_n-\lambda_0)
+\xrightarrow{d}
+N_{p_\lambda}
+\left(0,I_{\lambda\lambda,0}^{-1}\right).
+\end{equation}
+Moreover, the maximized local likelihood
+criteria under the full and restricted
+parameter spaces converge jointly to
+their respective Gaussian quadratic
+suprema.
+\end{corollary}
+
+The result follows by maximizing the common local
+quadratic criterion over the restricted tangent space
+$\mathbb R^{p_\lambda}\times\{0\}$.
+The maximizer is $I_{\lambda\lambda,0}^{-1}Z_\lambda$;
+joint convergence follows from the common LAN process
+and the localization assumptions for both fits.
+The argument is detailed in Appendix~\ref{app:asymptotics}.
+
+
+\subsection{Projection under the Fisher information metric}
+\label{subsec:fisher_projection}
+Partition the information matrix as
+\begin{equation}\label{eq:sec4-information-partition}
+I_0=
+\begin{pmatrix}
+I_{\lambda\lambda}&I_{\lambda\gamma}\\
+I_{\gamma\lambda}&I_{\gamma\gamma}
+\end{pmatrix},
+\end{equation}
+with blocks evaluated at $\theta_0$. Define the efficient covariance information
+\begin{equation}\label{eq:sec4-efficient-information}
+\begin{aligned}
+J={}&I_{\gamma\gamma}\\
+&-I_{\gamma\lambda}I_{\lambda\lambda}^{-1}
+I_{\lambda\gamma}.
+\end{aligned}
+\end{equation}
+Partition $Z=(Z_\lambda^{\mathsf T},Z_\gamma^{\mathsf T})^{\mathsf T}$ and set
+\begin{equation}\label{eq:sec4-efficient-score}
+\begin{aligned}
+Z_{\gamma\cdot\lambda}
+={}&Z_\gamma\\
+&-I_{\gamma\lambda}I_{\lambda\lambda}^{-1}Z_\lambda.
+\end{aligned}
+\end{equation}
+Then $Z_{\gamma\cdot\lambda}\sim N(0,J)$. Writing $H_0=(h_\lambda^{*\mathsf T},h_\gamma^{*\mathsf T})^{\mathsf T}$, the full projection admits the block characterization
+\begin{align}
+ h_\gamma^*
+ &=\Pi_{T_K(\gamma_0)}^J
+ (J^{-1}Z_{\gamma\cdot\lambda}),
+ \label{eq:sec4-cov-projection}\\
+ h_\lambda^*
+ &=I_{\lambda\lambda}^{-1}
+ (Z_\lambda-I_{\lambda\gamma}h_\gamma^*).
+ \label{eq:sec4-nuisance-projection}
+\end{align}
+Thus nuisance adjustment determines the covariance projection through $J$, while the covariance constraint feeds back into the nuisance estimator through $I_{\lambda\gamma}$. Unrestricted nuisance coordinates do not, by themselves, imply an unconstrained Gaussian limit for their estimators. These block identities follow by profiling the Gaussian quadratic criterion; the calculation is given in Appendix~\ref{app:asymptotics}.
+
+
+The efficient-information formula above is expressed in the original
+covariance coordinates. When an exact nonlinear VPC hypothesis is
+straightened by a nuisance-dependent transformation of covariance
+coordinates, the information must first be transformed for the
+\emph{full} parameter vector. If $F$ maps transformed coordinates
+$\eta=(\lambda^{\mathsf T},\nu^{\mathsf T})^{\mathsf T}$ to the
+original $\theta$, with Jacobian $L_F=D_\eta F$, then the appropriate
+information is $\widetilde I=L_F^{\mathsf T}I L_F$ and its efficient
+covariance block is
+\begin{equation}\label{eq:sec4-transformed-efficient-information}
+\widetilde J=\widetilde I_{\nu\nu}
+-\widetilde I_{\nu\lambda}
+ \widetilde I_{\lambda\lambda}^{-1}
+ \widetilde I_{\lambda\nu}.
+\end{equation}
+A covariance-only congruence of $J$ is generally incorrect when the
+coordinate chart depends on nuisance parameters; the distinction is
+used for the exact VPC contrast geometry in
+Section~\ref{sec:equality_vpc}.
+
+\subsection{Implications for inference on smooth functionals}
+\label{subsec:functional_asymptotics}
+
+Let $g:\Theta\to\mathbb R^r$ denote a functional,
+such as the VPC at one or more covariate values
+or a contrast of VPCs. Suppose $g$ admits a
+continuously differentiable local extension
+around $\theta_0$, or more generally is
+Hadamard directionally differentiable
+tangentially to $T_0$, with derivative
+$g'_{\theta_0}(h)$.
+Applying the directional delta method of
+\citet{fangsantos2019}, under its requisite
+tangential differentiability and regularity
+conditions, gives
+\begin{equation}
+\begin{aligned}
+&\sqrt n\{g(\widehat\theta_n)-g(\theta_0)\}\\
+&\qquad\xrightarrow{d}g'_{\theta_0}(H_0).
+\end{aligned}
+\label{eq:sec4-functional-limit}
+\end{equation}
+For a smooth extension, $g'_{\theta_0}(h)=Dg(\theta_0)h$. Even then, the limit need not be Gaussian because $H_0$ need not be Gaussian. At a zero-VPC point $x_0$, Proposition~\ref{prop:zero_vpc_gradient} identifies the ambient gradient, but feasible directions and the true covariance rank remain essential. If the first-order derivative vanishes identically on the limiting directions, higher-order analysis is required.
+
+
+Section~\ref{sec:global_lrt} specializes the
+vertex geometry to global likelihood-ratio
+inference. Other inferential problems may
+require different null tangent sets, while
+the general projection framework remains the same.
