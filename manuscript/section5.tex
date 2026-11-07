@@ -1,0 +1,469 @@
+\section{Omnibus VPC Significance Testing}
+\label{sec:global_lrt}
+
+\subsection{Omnibus VPC hypothesis and its covariance representation}
+\label{subsec:global_hypothesis}
+The variance partition coefficient $\rho(x;\theta)$ describes the
+proportion of marginal response variation attributable to between-cluster
+heterogeneity at covariate value $x$. We first ask whether this
+contribution vanishes throughout the covariate domain $\mathcal X$.
+The \emph{omnibus VPC significance test} concerns
+\begin{equation}\label{eq:sec5-vpc-null}
+ \begin{aligned}
+ H_0^{\mathrm{omni}}:&\quad
+ \rho(x;\theta)=0\quad(\forall x\in\mathcal X),\\
+ H_1^{\mathrm{omni}}:&\quad
+ \rho(x;\theta)>0\quad(\exists x\in\mathcal X).
+ \end{aligned}
+\end{equation}
+This is distinct from pointwise VPC significance, which concerns
+$\rho(x_0;\theta)=0$ at one prespecified covariate value, and from
+VPC equality, which concerns $\rho(x_i;\theta)=\rho(x_j;\theta)$.
+
+Write $z(x)=(1,x)^{\mathsf T}$ and let
+$\Gamma\succeq0$ denote the random-intercept-and-slope covariance
+matrix. The variance of the random-effects contribution to the linear
+predictor is $v(x)=z(x)^{\mathsf T}\Gamma z(x)$.
+Throughout this section we use the zero-VPC property established for
+the VPC definition in this manuscript: at the covariate values under
+consideration, $\rho(x;\theta)=0$ if and only if $v(x)=0$.
+In particular, the observation-level variance contribution is assumed
+strictly positive so that the VPC is well defined.
+
+\begin{proposition}\label{prop:sec5-omnibus-equivalence}
+Suppose $\Gamma\succeq0$, the zero-VPC property holds for all
+$x\in\mathcal X$, and $\mathcal X$ contains at least two distinct
+covariate values. Then
+\[
+ \rho(x;\theta)=0\ \text{for every }x\in\mathcal X
+ \quad\Longleftrightarrow\quad \Gamma=0.
+\]
+In particular, the equivalence holds for the binary domain
+$\mathcal X=\{0,1\}$.
+\end{proposition}
+
+\begin{proof}
+For a positive-semidefinite matrix, $z^{\mathsf T}\Gamma z=0$
+if and only if $\Gamma z=0$, as follows from a positive-semidefinite
+square root of $\Gamma$. If the VPC vanishes at two distinct values
+$x_a\ne x_b$, then $\Gamma z(x_a)=\Gamma z(x_b)=0$.
+The vectors $z(x_a)$ and $z(x_b)$ are linearly independent, hence
+span $\mathbb R^2$, so $\Gamma=0$. The converse is immediate from
+the zero-VPC property.
+\end{proof}
+
+Accordingly, under the stated design and VPC conditions, the scientific
+hypothesis in \eqref{eq:sec5-vpc-null} has the equivalent covariance
+representation
+\begin{equation}\label{eq:sec5-null}
+ \begin{aligned}
+ H_0^{\mathrm{omni}}:&\quad\Gamma=0,\\
+ H_1^{\mathrm{omni}}:&\quad\Gamma\succeq0,\quad\Gamma\ne0.
+ \end{aligned}
+\end{equation}
+Thus the covariance restriction is a computational representation of an
+omnibus VPC hypothesis, not a change of inferential target.
+If $\mathcal X$ contains only one distinct value, this equivalence
+need not hold: a nonzero rank-one covariance matrix may annihilate
+that design vector.
+
+Write $\theta=(\lambda^{\mathsf T},\gamma^{\mathsf T})^{\mathsf T}$,
+where $\lambda\in\Lambda\subset\mathbb R^{p_\lambda}$ collects the
+unrestricted nuisance coordinates and
+$\gamma=(\gamma_{11},\gamma_{12},\gamma_{22})^{\mathsf T}$
+parameterizes $\Gamma$, as in Section~\ref{sec:geometry_asymptotics}.
+Under the omnibus null $\gamma=0$; under the alternative $\gamma$
+belongs to the positive-semidefinite cone $K$.
+
+\subsection{Likelihood-ratio statistic}
+\label{subsec:global_lrt_statistic}
+Let $\widehat\theta_n=(\widehat\lambda_n,\widehat\gamma_n)$
+maximize the marginal likelihood over $\Lambda\times K$, and let
+$\widetilde\lambda_n$ maximize it subject to $\gamma=0$.
+The likelihood-ratio statistic for the omnibus VPC hypothesis is
+\begin{equation}\label{eq:sec5-lrt}
+ \begin{aligned}
+ \mathrm{LRT}_{\mathrm{omni},n}
+ &=2\bigl\{\ell_n(\widehat\theta_n)\\
+ &\qquad-\ell_n(\widetilde\lambda_n,0)\bigr\}.
+ \end{aligned}
+\end{equation}
+The statistic is nonnegative for exact global maximizers because the
+restricted parameter space is contained in the full parameter space.
+Numerically negative values indicate optimization error and should
+not be interpreted as realizations from the null law. In particular,
+truncation of materially negative numerical values to zero does not
+establish that the computed likelihood ratio approximates the exact
+likelihood ratio. The asymptotic results below require both fitted
+likelihood values to approximate their respective global maxima with
+error $o_p(1)$ on the log-likelihood scale.
+
+\subsection{Efficient information under the omnibus VPC null}
+\label{subsec:global_efficient_information}
+Let $I_0$ be the normalized full Fisher information at
+$\theta_0=(\lambda_0,0)$, partitioned as in
+Section~\ref{subsec:fisher_projection}. Define
+\begin{equation}\label{eq:sec5-J}
+ \begin{aligned}
+ J_0={}&I_{\gamma\gamma,0}\\
+ &-I_{\gamma\lambda,0}
+ I_{\lambda\lambda,0}^{-1}I_{\lambda\gamma,0}.
+ \end{aligned}
+\end{equation}
+The efficient covariance score has limiting distribution
+$Z_{\gamma\cdot\lambda}\sim N_3(0,J_0)$.
+The efficient information $J_0$, rather than the unadjusted
+covariance block, accounts for estimation of the unrestricted nuisance
+coordinates. Section~\ref{sec:information} develops its evaluation
+under the restricted null.
+
+
+\subsection{Gaussian projection and chi-bar-square limit}
+\label{subsec:global_chibar_limit}
+
+Likelihood-ratio statistics under inequality and
+convex-cone constraints generally need not follow
+the ordinary chi-square limits of unconstrained
+likelihood theory \citep{self1987asymptotic,shapiro1985}.
+For convex cones, the limiting distribution can
+be expressed through Gaussian projections and
+associated chi-bar-square mixtures
+\citep{amelunxen2014}.
+
+Let $J_0^{1/2}$ be the symmetric positive-definite
+square root and put
+\begin{equation}
+\mathcal C_0=J_0^{1/2}K.
+\label{eq:sec5-transformed-cone}
+\end{equation}
+For a closed convex cone $C$, denote Euclidean
+projection onto $C$ by $\Pi_C$.
+
+
+\begin{theorem}\label{thm:sec5-global-lrt}
+Suppose $H_0$ holds at $\theta_0=(\lambda_0^{\mathsf T},0^{\mathsf T})^{\mathsf T}$,
+with $I_0\succ0$, and the uniform local quadratic expansion,
+feasible-set convergence, and joint full/restricted localization
+and approximate-maximization conditions of
+Section~\ref{sec:geometry_asymptotics} and
+Appendix~\ref{app:asymptotics} hold. Then
+\begin{equation}\label{eq:sec5-lrt-limit}
+ \mathrm{LRT}_{\mathrm{omni},n}\xrightarrow{d}
+ \|\Pi_{\mathcal C_0}(G)\|^2,
+ \qquad G\sim N_3(0,I_3).
+\end{equation}
+Equivalently, the limiting law is the chi-bar-square mixture
+\begin{equation}\label{eq:sec5-chibar}
+ \sum_{j=0}^{3}w_j\chi_j^2,
+ \qquad w_j\geq0,\quad\sum_{j=0}^{3}w_j=1,
+\end{equation}
+where $\chi_0^2$ is a point mass at zero and
+$w_j=v_j(\mathcal C_0)$ are the conic intrinsic volumes of
+$\mathcal C_0$.
+\end{theorem}
+
+The result follows from joint convergence of the full and restricted
+maximized local likelihoods, both driven by the same Gaussian score.
+Profiling the common quadratic likelihood over $\lambda$ and
+comparing its maximum over $K$ with its maximum at the vertex yields
+the Gaussian projection representation. The detailed derivation and
+chi-bar-square identification are given in
+Appendix~\ref{app:global_lrt}. In particular, an ordinary
+$\chi_3^2$ reference distribution does not generally give the
+correct null calibration.
+
+
+\subsection{Exact mixture weights for the
+$2\times2$ PSD cone}
+\label{subsec:global_exact_weights}
+
+The chi-bar-square weights are the conic intrinsic
+volumes of the information-transformed covariance
+cone. Their geometric interpretation and the
+conic Gauss--Bonnet relations are developed in
+\citet{amelunxen2014}.
+
+For a cone $C\subset\mathbb R^3$, let
+$C^\circ=\{y:y^{\mathsf T}x\leq0
+\ \text{for all }x\in C\}$
+denote its polar. Let $\Omega(C)$ be its solid
+angle, namely the surface area of
+$C\cap\mathbb S^2$.
+
+
+\begin{proposition}\label{prop:sec5-solid-angle-weights}
+For the proper, full-dimensional cone
+$\mathcal C_0=J_0^{1/2}K$, the four weights in
+\eqref{eq:sec5-chibar} satisfy
+\begin{equation}\label{eq:sec5-extreme-weights}
+ w_3=\frac{\Omega(\mathcal C_0)}{4\pi},
+ \qquad
+ w_0=\frac{\Omega(\mathcal C_0^\circ)}{4\pi},
+\end{equation}
+and
+\begin{equation}\label{eq:sec5-middle-weights}
+ w_1=\frac12-w_3,
+ \qquad
+ w_2=\frac12-w_0.
+\end{equation}
+Thus two solid-angle calculations determine all four weights.
+\end{proposition}
+
+The first identities are the extreme conic intrinsic volumes; the
+remaining identities follow from the conic Gauss--Bonnet relations in
+three dimensions. Appendix~\ref{app:global_lrt} provides the geometric details and the
+one-dimensional integral used for their numerical evaluation.
+
+\subsection{Solid-angle calculation and numerical quadrature}
+\label{subsec:global_solid_angle}
+Use the Lorentz transformation $t=L\gamma$ from
+Section~\ref{subsec:lorentz_representation}. The Lorentz cone
+$\mathcal L_3$ is self-dual under the Euclidean inner product. Hence
+\begin{equation}\label{eq:sec5-angle-maps}
+ \begin{aligned}
+ \mathcal C_0&=A_+\mathcal L_3,
+ &A_+&=J_0^{1/2}L^{-1},\\
+ \mathcal C_0^\circ&=A_-\mathcal L_3,
+ &A_-&=-J_0^{-1/2}L^{\mathsf T}.
+ \end{aligned}
+\end{equation}
+For either invertible map $A$, a boundary-ray parameterization is
+\begin{equation}\label{eq:sec5-boundary-rays}
+ \begin{aligned}
+ r(\varphi)&=(1,\cos\varphi,\sin\varphi)^{\mathsf T},\\
+ &0\leq\varphi\leq2\pi.
+ \end{aligned}
+\end{equation}
+Set $b_A(\varphi)=Ar(\varphi)/\|Ar(\varphi)\|$ and
+$a_A=Ae_1/\|Ae_1\|$, where $e_1=(1,0,0)^{\mathsf T}$.
+The spherical boundary formula yields
+\begin{equation}\label{eq:sec5-angle-integral}
+ \begin{aligned}
+ \Omega(A\mathcal L_3)
+ &=\left|\int_0^{2\pi}q_A(\varphi)\,d\varphi\right|,\\
+ q_A(\varphi)
+ &=\frac{a_A^{\mathsf T}
+ [b_A(\varphi)\times b_A'(\varphi)]}
+ {1+a_A^{\mathsf T}b_A(\varphi)}.
+ \end{aligned}
+\end{equation}
+This smooth one-dimensional integral is evaluated for $A_+$ and
+$A_-$ using deterministic quadrature. Appendix~\ref{app:global_lrt} derives the formula,
+its orientation, and stable equivalent expressions. In computation,
+the resulting weights should be checked for nonnegativity, unit sum,
+and the two half-sum identities in
+\eqref{eq:sec5-middle-weights}.
+
+\subsection{Plug-in weights and asymptotic critical values}
+\label{subsec:global_plugin}
+Evaluate the analytical information from Section~\ref{sec:information}
+at the restricted null estimator $(\widetilde\lambda_n,0)$.
+Let $\widehat J_n$ denote the Schur complement of the resulting
+normalized information matrix. For each positive-definite $J$,
+write $w_j(J)$ for the exact conic intrinsic-volume weight of
+$J^{1/2}K$. Let
+$\widehat w_n=(\widehat w_{0,n},\ldots,\widehat w_{3,n})$
+denote the weights computed by deterministic solid-angle quadrature
+using $\widehat J_n$.
+For $t>0$, the plug-in upper-tail probability is
+\begin{equation}\label{eq:sec5-plugin-p}
+ \widehat p_n(t)=
+ \sum_{j=1}^{3}\widehat w_{j,n}
+ \Pr(\chi_j^2\geq t).
+\end{equation}
+At $t=0$, the inclusive upper-tail probability is one; the limiting
+law has an atom of size $w_0=w_0(J_0)$ at zero. The positive-tail
+formula above is not the inclusive upper-tail probability at zero.
+
+\begin{proposition}\label{prop:sec5-plugin-validity}
+Suppose the assumptions of Theorem~\ref{thm:sec5-global-lrt}
+hold, the restricted-null analytical information estimator is
+consistent so that $\widehat J_n\xrightarrow{p}J_0\succ0$, and
+$\widehat J_n$ is positive definite with probability tending to one,
+and the numerical weights satisfy
+\begin{equation}\label{eq:sec5-numerical-error}
+ \max_{0\leq j\leq3}
+ \bigl|\widehat w_{j,n}-w_j(\widehat J_n)\bigr|
+ =o_p(1).
+\end{equation}
+Then
+\[
+ \widehat w_{j,n}\xrightarrow{p}w_j(J_0),
+ \qquad j=0,1,2,3.
+\]
+For a fixed $\alpha\in(0,1-w_0(J_0))$, let
+$\widehat c_{1-\alpha}$ be the upper $\alpha$ critical value of
+the plug-in chi-bar-square law. The test rejecting when
+$\mathrm{LRT}_{\mathrm{omni},n}>\widehat c_{1-\alpha}$ has asymptotic size
+$\alpha$.
+\end{proposition}
+
+The result follows from continuity of the solid angles under
+nonsingular linear transformations, the $o_p(1)$ quadrature error
+condition, and convergence of the strictly positive mixture
+critical value. Appendix~\ref{app:global_lrt} gives the proof.
+A fixed numerical integration tolerance alone is not an
+asymptotically vanishing error condition. The true-$J_0$ weights
+provide an oracle benchmark, whereas the restricted-null plug-in
+weights define the feasible procedure. Finite-sample calibration
+is examined by simulation.
+
+
+\subsection{Compact-uniform four-family calibration}
+\label{subsec:sec5-uniform-omnibus}
+The preceding asymptotic law is a fixed-parameter statement. A
+uniform guarantee over a class of omnibus-null nuisance parameters
+requires more than pointwise local asymptotic normality. We state the
+corresponding result for the explicit model and design classes in the
+completed regularity theory. The covariance vertex is fixed under this
+null, so the uniformity concerns nuisance variation; uniformity across
+covariance ranks arises in the pointwise, contrast, and confidence-region
+problems addressed in later sections.
+
+Let $\Lambda_+\subset\mathbb R^{p_\lambda}$ be a fixed compact convex
+admissible nuisance fitting set, with a compact true class
+$\Lambda_0\subset\operatorname{int}(\Lambda_+)$. Fit over
+\begin{equation}\label{eq:sec5-compact-fit}
+\Theta_+=\Lambda_+\times
+\left\{\gamma\in K:
+\operatorname{tr}\{\Gamma(\gamma)\}\leq M\right\},
+\qquad M>0,
+\end{equation}
+so the artificial upper covariance boundary is separated from the
+null vertex. The clusters are independent, with bounded sizes and a
+finite collection of deterministic design types having limiting
+frequencies. The collection contains a positive-frequency informative
+design (or the explicitly identifying grouped-design extension), and
+the full information is uniformly positive definite. The nuisance
+dimension is arbitrary but fixed. For Gaussian models, the residual
+variance stays in a compact subset of $(0,\infty)$; for NB2 the
+unknown size does likewise; and for compound Poisson--Gamma models
+both unknown dispersion and power remain in compact subsets of
+$(0,\infty)$ and $(1,2)$, respectively. The specified Gaussian
+identity-link, and Poisson, NB2, and compound Poisson--Gamma log-link
+models satisfy the required marginal likelihood regularity under
+these informative designs.
+
+\begin{corollary}\label{cor:sec5-uniform-omnibus}
+Under the preceding compact fitted and informative-design
+conditions, suppose the global full and null likelihood suprema are
+attained (or approximated to a uniform $o_p(1)$ objective gap),
+and let $\widehat J_n$ be a uniformly consistent positive-definite
+restricted-null information estimator. Suppose further that the
+computed weights satisfy, for each $\varepsilon>0$,
+\begin{equation}\label{eq:sec5-uniform-weights}
+\sup_{\lambda\in\Lambda_0}
+\Pr_{(\lambda,0)}\!\left\{
+\max_{0\leq j\leq3}
+\left|\widehat w_{j,n}-w_j(\widehat J_n)\right|
+>\varepsilon\right\}\longrightarrow0.
+\end{equation}
+For any fixed $0<\alpha<1/2$, the positive plug-in
+chi-bar-square critical value $\widehat c_{1-\alpha}$ obeys
+\begin{equation}\label{eq:sec5-uniform-size}
+\sup_{\lambda\in\Lambda_0}
+\left|
+\Pr_{(\lambda,0)}\!\left\{
+\mathrm{LRT}_{\mathrm{omni},n}>
+\widehat c_{1-\alpha}\right\}-\alpha
+\right|\longrightarrow0.
+\end{equation}
+Thus the omnibus test has compact-uniform asymptotic size
+$\alpha$ for the stated four-family classes.
+\end{corollary}
+
+\begin{proof}
+The verified common likelihood envelopes, identification, and
+information bounds give uniform root-$n$ localization, a
+true-centered quadratic expansion, and a uniform efficient-score
+central limit theorem at the covariance vertex. Because the local
+null and alternative covariance sets are respectively $\{0\}$ and
+$K$, joint likelihood maximization yields the Gaussian projection
+law in \eqref{eq:sec5-lrt-limit} uniformly along every sequence
+$\lambda_n\in\Lambda_0$. Continuity of the
+information-transformed solid angles and uniform consistency of
+$\widehat J_n$ and the numerical weights imply uniform convergence
+of the mixture weights. The polar solid-angle probability
+$w_0(J)$ is strictly below $1/2$ for every proper three-dimensional
+information-transformed PSD cone. Compactness of the information
+class makes its separation from $1/2$ uniform. Therefore
+$0<\alpha<1/2$ yields critical values uniformly bounded away
+from zero, where the limiting mixture distribution is continuous
+and strictly increasing. Uniform Gaussian approximation, critical-
+value consistency, and this positive-threshold continuity establish
+\eqref{eq:sec5-uniform-size}.
+\end{proof}
+
+The result concerns the \emph{ideal marginal-likelihood} test with
+correctly constrained global suprema. Uniform $o_p(1)$ numerical
+errors in the complete maximized log likelihoods and in critical
+values are sufficient for transfer to an implemented procedure;
+fixed quadrature or optimization tolerances alone do not verify
+those requirements. The hypotheses exclude growing cluster sizes,
+unidentified designs, nuisance parameters approaching their
+physical endpoints, and sequences with singular full Fisher
+information. They do \emph{not} fix either compound
+Poisson--Gamma dispersion or power.
+
+\subsection{Comparison with conventional chi-square calibration}
+\label{subsec:global_chisq_comparison}
+A conventional three-degree-of-freedom reference ignores the
+positive-semidefinite restriction and treats the three covariance
+coordinates as locally unrestricted. At the vertex, however, the
+local alternative is the proper cone $K$, not $\mathbb R^3$.
+Consequently, the $\chi_3^2$ approximation does not reproduce the
+chi-bar-square null law. It nevertheless provides a conservative
+asymptotic reference.
+
+\begin{proposition}\label{prop:sec5-chisq-conservative}
+Under the assumptions of Theorem~\ref{thm:sec5-global-lrt},
+let $T=\|\Pi_{\mathcal C_0}(G)\|^2$ with
+$G\sim N_3(0,I_3)$. Then, for every $t\geq0$,
+\begin{equation}\label{eq:sec5-chisq-order}
+ \Pr(T>t)\leq\Pr(\chi_3^2>t).
+\end{equation}
+Thus the test rejecting when $\mathrm{LRT}_{\mathrm{omni},n}$ exceeds the
+upper $\alpha$ critical value of $\chi_3^2$ has asymptotic
+rejection probability at most $\alpha$ under $H_0$.
+\end{proposition}
+
+Indeed, Moreau's orthogonal decomposition gives
+\[
+ \|G\|^2=\|\Pi_{\mathcal C_0}(G)\|^2
+ +\|\Pi_{\mathcal C_0^\circ}(G)\|^2,
+\]
+so $T\leq\|G\|^2$ almost surely, while
+$\|G\|^2\sim\chi_3^2$. The complete proof is in
+Appendix~\ref{app:global_lrt}.
+We compare the oracle and plug-in cone calibrations with this
+conservative conventional reference through empirical rejection
+rates, power, and representative distributional diagnostics.
+
+\subsection{Relationship to previous variance-component
+testing methods}
+\label{subsec:global_prior_methods}
+
+Likelihood-ratio inference under boundary constraints
+has a substantial theoretical foundation
+\citep{chant1974asymptotic,self1987asymptotic,
+shapiro1985}. In mixed-effects models,
+\citet{stram1994variance} investigated
+variance-component testing for longitudinal data,
+while \citet{zhang2008variance} considered
+variance-component testing in generalized linear
+mixed models.
+
+The chi-bar-square structure is an established consequence of
+likelihood-ratio theory under convex-cone restrictions
+\citep{self1987asymptotic,shapiro1985,amelunxen2014}. Our
+specialization uses the random-intercept-and-slope
+PSD cone, the nuisance-adjusted information metric,
+and the information calculations developed in
+Section~\ref{sec:information}.
+
+The solid-angle formulation avoids approximating
+the covariance cone by an orthant and provides
+a direct numerical route to its exact asymptotic
+weights. The geometric derivations and calibration arguments are given in
+Appendix~\ref{app:global_lrt}; the comparison with earlier
+variance-component methods is confined to the present subsection.
